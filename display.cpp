@@ -1,16 +1,21 @@
 #include "display.h"
 #include "display_config.h"
 
-TFT_eSPI tft = TFT_eSPI();
-
-void displayInit()
+void displayInit(TFT_eSPI &tft)
 {
     tft.init();
     tft.setRotation(TFT_ROTATION);
     tft.fillScreen(TFT_BLACK);
 }
 
-void displayLoop()
+void displayDrawSystemBar(TFT_eSPI &tft)
 {
-    // Rien pour le moment.
+    // BARRE SYSTEME | Zone standardisee utilisee par tous les ecrans
+    tft.fillRect(
+        SYSTEM_BAR_X,
+        SYSTEM_BAR_Y,
+        SYSTEM_BAR_WIDTH,
+        SYSTEM_BAR_HEIGHT,
+        SYSTEM_BAR_COLOR
+    );
 }

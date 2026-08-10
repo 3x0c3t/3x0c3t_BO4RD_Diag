@@ -1,30 +1,26 @@
 #include <Arduino.h>
 #include <SPI.h>
-
-// ============================================================
-// CONFIGURATION
-// ============================================================
+#include <TFT_eSPI.h>
 
 #include "config.h"
 #include "display_config.h"
 #include "personalization.h"
 
-// ============================================================
-// MODULES
-// ============================================================
-
 #include "display.h"
 #include "splash.h"
 
-// ============================================================
 // MODULES DESACTIVES
-// ============================================================
-
 // #include "touch.h"
 // #include "sd_diag.h"
 // #include "wifi_diag.h"
 // #include "system_diag.h"
 // #include "diagnostics.h"
+
+// ============================================================
+// TFT
+// ============================================================
+
+TFT_eSPI tft = TFT_eSPI();
 
 // ============================================================
 // SETUP
@@ -37,7 +33,6 @@ void setup()
     // --------------------------------------------------------
 
     Serial.begin(115200);
-
     delay(500);
 
     Serial.println();
@@ -61,7 +56,7 @@ void setup()
 
     Serial.println("[BOOT] Initialisation display...");
 
-    displayInit();
+    displayInit(tft);
 
     Serial.println("[BOOT] Display initialise");
 
@@ -76,6 +71,14 @@ void setup()
     splashWait();
 
     Serial.println("[BOOT] Splash termine");
+
+    // --------------------------------------------------------
+    // BARRE SYSTEME
+    // --------------------------------------------------------
+
+    displayDrawSystemBar(tft);
+
+    Serial.println("[BOOT] Barre systeme affichee");
 
     // --------------------------------------------------------
     // MODULES DESACTIVES
@@ -106,7 +109,7 @@ void setup()
 
 void loop()
 {
-    displayLoop();
+    // Aucun module actif pour le moment.
 
     delay(10);
 }

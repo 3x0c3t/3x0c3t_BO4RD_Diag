@@ -35,27 +35,13 @@ void splashShow(TFT_eSPI &tft)
         190
     );
 
-    // Cadre de progression
-    int barX = 40;
-    int barY = 230;
-    int barW = TFT_WIDTH - 80;
-    int barH = 10;
-
-    tft.drawRect(
-        barX,
-        barY,
-        barW,
-        barH,
-        SPLASH_TEXT_COLOR
-    );
-
-    // Progression
+    // BARRE SYSTEME | Position standardisee
     tft.fillRect(
-        barX + 2,
-        barY + 2,
-        barW - 4,
-        barH - 4,
-        SPLASH_TEXT_COLOR
+        SYSTEM_BAR_X,
+        SYSTEM_BAR_Y,
+        SYSTEM_BAR_WIDTH,
+        SYSTEM_BAR_HEIGHT,
+        SYSTEM_BAR_COLOR
     );
 }
 

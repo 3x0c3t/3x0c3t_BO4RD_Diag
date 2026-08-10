@@ -3,9 +3,7 @@
 
 #include <TFT_eSPI.h>
 
-extern TFT_eSPI tft;
-
-void displayInit();
-void displayLoop();
+void displayInit(TFT_eSPI &tft);
+void displayDrawSystemBar(TFT_eSPI &tft);
 
 #endif
