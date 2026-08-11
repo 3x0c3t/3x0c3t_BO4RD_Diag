@@ -1,39 +1,37 @@
-// DEBUG 20260812-00:12
-
-
 #include <Arduino.h>
-#include <SPI.h>
-#include <XPT2046_Touchscreen.h>
+#include <TFT_eSPI.h>
 
 #include "touch.h"
+#include "debug.h"
 
-static XPT2046_Touchscreen touch(BO4RD_TOUCH_CS);
+// ============================================================
+// TFT GLOBAL
+// ============================================================
+
+extern TFT_eSPI tft;
+
+// ============================================================
+// ETAT
+// ============================================================
 
 static bool touchInitialized = false;
 
+// ============================================================
+// INITIALISATION
+// ============================================================
+
 void touchInit()
 {
-    Serial.println();
-    Serial.println("[TOUCH] INIT XPT2046");
-
-    // TFT CS désactivé
-    pinMode(BO4RD_TFT_CS, OUTPUT);
-    digitalWrite(BO4RD_TFT_CS, HIGH);
-
-    // Touch CS désactivé
-    pinMode(BO4RD_TOUCH_CS, OUTPUT);
-    digitalWrite(BO4RD_TOUCH_CS, HIGH);
-
-    SPI.begin();
-
-    Serial.println("[TOUCH] SPI OK");
-
-    touch.begin(SPI);
+    LOGLN_TOUCH("[TOUCH] Initialisation TFT_eSPI tactile");
 
     touchInitialized = true;
 
-    Serial.println("[TOUCH] XPT2046 BEGIN OK");
+    LOGLN_TOUCH("[TOUCH] Tactile initialise");
 }
+
+// ============================================================
+// DISPONIBILITE
+// ============================================================
 
 bool touchAvailable()
 {
@@ -42,8 +40,15 @@ bool touchAvailable()
         return false;
     }
 
-    return touch.touched();
+    uint16_t x;
+    uint16_t y;
+
+    return tft.getTouch(&x, &y);
 }
+
+// ============================================================
+// LECTURE
+// ============================================================
 
 bool touchRead(
     int16_t &x,
@@ -56,25 +61,43 @@ bool touchRead(
         return false;
     }
 
-    if (!touch.touched())
+    uint16_t tx;
+    uint16_t ty;
+
+    if (!tft.getTouch(&tx, &ty))
     {
         return false;
     }
 
-    TS_Point p = touch.getPoint();
+    x = (int16_t)tx;
+    y = (int16_t)ty;
 
-    x = p.x;
-    y = p.y;
-    pressure = p.z;
+    // TFT_eSPI ne fournit pas la pression avec getTouch().
+    pressure = 1;
 
-    Serial.print("[TOUCH] RAW X=");
-    Serial.print(p.x);
+    // ========================================================
+    // LOG IMPORTANT
+    // ========================================================
 
-    Serial.print(" Y=");
-    Serial.print(p.y);
+    LOG_TOUCH("[TOUCH] X=");
+    LOG_TOUCH(x);
+    LOG_TOUCH(" Y=");
+    LOG_TOUCH(y);
+    LOG_TOUCH(" Z=");
+    LOGLN_TOUCH(pressure);
 
-    Serial.print(" Z=");
-    Serial.println(p.z);
+    // ========================================================
+    // LOG DETAIL
+    // ========================================================
+
+    LOG_TOUCH_DETAIL("[TOUCH] X = ");
+    LOGLN_TOUCH_DETAIL(x);
+
+    LOG_TOUCH_DETAIL("[TOUCH] Y = ");
+    LOGLN_TOUCH_DETAIL(y);
+
+    LOG_TOUCH_DETAIL("[TOUCH] Pression = ");
+    LOGLN_TOUCH_DETAIL(pressure);
 
     return true;
 }
