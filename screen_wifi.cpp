@@ -1,82 +1,197 @@
+#include <Arduino.h>
+#include <TFT_eSPI.h>
+
 #include "screen_wifi.h"
+#include "wifi_diag.h"
+#include "debug.h"
 
 // ============================================================
-// ÉCRAN WI-FI
+// ECRAN WI-FI
 // ============================================================
 
-void wifiScreenInit(TFT_eSPI &tft)
+// ------------------------------------------------------------
+// PARAMETRES AFFICHAGE
+// ------------------------------------------------------------
+
+static const int WIFI_TITLE_Y = 45;
+static const int WIFI_LINE_Y = 75;
+static const int WIFI_BUTTON_Y = 95;
+static const int WIFI_BUTTON_H = 42;
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+
+void wifiScreenInit(
+    TFT_eSPI &tft
+)
 {
-    // Initialisation de l'écran Wi-Fi.
-    // Pour l'instant, aucune initialisation spécifique.
-    // La fonction existe afin que le système de pages
-    // puisse l'appeler proprement.
-
-    (void)tft;
+    LOG_WIFI("[WIFI] Ecran Wi-Fi initialise");
 }
 
 // ============================================================
 // AFFICHAGE
 // ============================================================
 
-void wifiScreenShow(TFT_eSPI &tft)
+void wifiScreenShow(
+    TFT_eSPI &tft
+)
 {
+    // --------------------------------------------------------
+    // FOND
+    // --------------------------------------------------------
+
     tft.fillScreen(TFT_BLACK);
+
+    // --------------------------------------------------------
+    // TITRE
+    // --------------------------------------------------------
 
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.setTextSize(2);
 
-    tft.setCursor(10, 10);
-    tft.println("WI-FI");
+    tft.setCursor(
+        10,
+        WIFI_TITLE_Y
+    );
+
+    tft.print("WI-FI");
+
+    // --------------------------------------------------------
+    // LIGNE
+    // --------------------------------------------------------
 
     tft.drawLine(
         0,
-        35,
+        WIFI_LINE_Y,
         tft.width(),
-        35,
+        WIFI_LINE_Y,
         TFT_WHITE
     );
 
+    // --------------------------------------------------------
+    // MODE
+    // --------------------------------------------------------
+
     tft.setTextSize(1);
 
-    tft.setCursor(10, 55);
-    tft.println("Etat Wi-Fi");
+    tft.setCursor(
+        10,
+        82
+    );
 
-    tft.setCursor(10, 75);
-    tft.println("----------------");
+    tft.print("Mode : ");
 
-    tft.setCursor(10, 100);
-    tft.println("SSID :");
+    uint8_t mode = wifiGetMode();
 
-    tft.setCursor(10, 120);
-    tft.println("IP   :");
+    if (mode == WIFI_MODE_OFF)
+    {
+        tft.print("OFF");
+    }
+    else if (mode == WIFI_MODE_CLIENT)
+    {
+        tft.print("CLIENT");
+    }
+    else if (mode == WIFI_MODE_AP)
+    {
+        tft.print("AP");
+    }
+    else
+    {
+        tft.print("UNKNOWN");
+    }
 
-    tft.setCursor(10, 140);
-    tft.println("Signal :");
+    // --------------------------------------------------------
+    // BOUTON SCAN
+    // --------------------------------------------------------
 
-    tft.setCursor(10, 180);
-    tft.println("Ecran Wi-Fi");
+    tft.fillRect(
+        10,
+        WIFI_BUTTON_Y,
+        tft.width() - 20,
+        WIFI_BUTTON_H,
+        TFT_BLUE
+    );
+
+    tft.setTextColor(TFT_WHITE, TFT_BLUE);
+    tft.setTextSize(2);
+
+    tft.setCursor(
+        65,
+        WIFI_BUTTON_Y + 12
+    );
+
+    tft.print("SCAN WI-FI");
+
+    // --------------------------------------------------------
+    // BOUTON OFF
+    // --------------------------------------------------------
+
+    tft.fillRect(
+        10,
+        150,
+        tft.width() - 20,
+        WIFI_BUTTON_H,
+        TFT_RED
+    );
+
+    tft.setTextColor(TFT_WHITE, TFT_RED);
+
+    tft.setCursor(
+        85,
+        162
+    );
+
+    tft.print("WI-FI OFF");
+
+    // --------------------------------------------------------
+    // RETOUR
+    // --------------------------------------------------------
+
+    tft.fillRect(
+        10,
+        210,
+        tft.width() - 20,
+        42,
+        TFT_DARKGREY
+    );
+
+    tft.setTextColor(
+        TFT_WHITE,
+        TFT_DARKGREY
+    );
+
+    tft.setCursor(
+        95,
+        222
+    );
+
+    tft.print("RETOUR");
+
+    // --------------------------------------------------------
+    // LOG
+    // --------------------------------------------------------
+
+    LOGLN_WIFI(
+        "[WIFI] Ecran affiche"
+    );
 }
 
 // ============================================================
 // LOOP
 // ============================================================
 
-void wifiScreenLoop(TFT_eSPI &tft)
+void wifiScreenLoop(
+    TFT_eSPI &tft
+)
 {
-    // Rien à faire pour l'instant.
-    // Cette fonction servira plus tard pour :
-    // - état de connexion
-    // - SSID
-    // - adresse IP
-    // - RSSI
-    // - reconnexion
-    // - etc.
-
-    (void)tft;
+    // --------------------------------------------------------
+    // Rien à faire en permanence pour le moment.
+    // --------------------------------------------------------
 }
 
 // ============================================================
-// TACTILE
+// TOUCH
 // ============================================================
 
 bool wifiScreenTouch(
@@ -85,11 +200,65 @@ bool wifiScreenTouch(
     uint8_t &newScreen
 )
 {
-    (void)x;
-    (void)y;
+    // --------------------------------------------------------
+    // RETOUR
+    // --------------------------------------------------------
 
-    // Aucune zone tactile spécifique pour l'instant.
-    newScreen = 0;
+    if (
+        x >= 10 &&
+        x <= 230 &&
+        y >= 210 &&
+        y <= 252
+    )
+    {
+        LOG_WIFI(
+            "[WIFI] Bouton RETOUR"
+        );
+
+        newScreen = 0;
+
+        return true;
+    }
+
+    // --------------------------------------------------------
+    // SCAN
+    // --------------------------------------------------------
+
+    if (
+        x >= 10 &&
+        x <= 230 &&
+        y >= 95 &&
+        y <= 137
+    )
+    {
+        LOGLN_WIFI(
+            "[WIFI] Bouton SCAN"
+        );
+
+        wifiScan();
+
+        return true;
+    }
+
+    // --------------------------------------------------------
+    // WI-FI OFF
+    // --------------------------------------------------------
+
+    if (
+        x >= 10 &&
+        x <= 230 &&
+        y >= 150 &&
+        y <= 192
+    )
+    {
+        LOGLN_WIFI(
+            "[WIFI] Bouton WI-FI OFF"
+        );
+
+        wifiSetMode(WIFI_MODE_OFF);
+
+        return true;
+    }
 
     return false;
 }

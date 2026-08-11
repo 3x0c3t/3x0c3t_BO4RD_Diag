@@ -4,6 +4,12 @@
 #include "display_config.h"
 #include "display.h"
 #include "screen_main.h"
+#include "debug.h"
+
+
+// ============================================================
+// BOUTONS MAIN
+// ============================================================
 
 static MainButton mainButtons[MAIN_BUTTON_COUNT] =
 {
@@ -57,16 +63,36 @@ static MainButton mainButtons[MAIN_BUTTON_COUNT] =
     }
 };
 
-void mainScreenInit(TFT_eSPI &tft)
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+
+void mainScreenInit(
+    TFT_eSPI &tft
+)
 {
-    Serial.println("[MAIN] Initialisation ecran principal");
+    (void)tft;
+
+    LOGLN_MAIN(
+        "[MAIN] Initialisation"
+    );
 }
+
+
+// ============================================================
+// DESSIN BOUTON
+// ============================================================
 
 static void drawMainButton(
     TFT_eSPI &tft,
     const MainButton &button
 )
 {
+    // --------------------------------------------------------
+    // Fond
+    // --------------------------------------------------------
+
     tft.fillRect(
         button.x,
         button.y,
@@ -74,6 +100,11 @@ static void drawMainButton(
         button.height,
         TFT_BLACK
     );
+
+
+    // --------------------------------------------------------
+    // Contour
+    // --------------------------------------------------------
 
     tft.drawRect(
         button.x,
@@ -83,12 +114,20 @@ static void drawMainButton(
         TFT_CYAN
     );
 
+
+    // --------------------------------------------------------
+    // Texte
+    // --------------------------------------------------------
+
     tft.setTextColor(
         TFT_WHITE,
         TFT_BLACK
     );
 
-    tft.setTextDatum(MC_DATUM);
+    tft.setTextDatum(
+        MC_DATUM
+    );
+
     tft.setTextSize(2);
 
     tft.drawString(
@@ -98,9 +137,23 @@ static void drawMainButton(
     );
 }
 
-void mainScreenShow(TFT_eSPI &tft)
+
+// ============================================================
+// AFFICHAGE MAIN
+// ============================================================
+
+void mainScreenShow(
+    TFT_eSPI &tft
+)
 {
-    Serial.println("[MAIN] Affichage page MAIN");
+    LOGLN_MAIN(
+        "[MAIN] Affichage page MAIN"
+    );
+
+
+    // --------------------------------------------------------
+    // Cadre commun
+    // --------------------------------------------------------
 
     displayDrawFrame(
         tft,
@@ -108,27 +161,59 @@ void mainScreenShow(TFT_eSPI &tft)
         100
     );
 
-    for (uint8_t i = 0; i < MAIN_BUTTON_COUNT; i++)
+
+    // --------------------------------------------------------
+    // Boutons
+    // --------------------------------------------------------
+
+    for (
+        uint8_t i = 0;
+        i < MAIN_BUTTON_COUNT;
+        i++
+    )
     {
         drawMainButton(
             tft,
             mainButtons[i]
         );
 
-        Serial.print("[MAIN] Bouton ");
-        Serial.print(i);
-        Serial.print(" : ");
-        Serial.print(mainButtons[i].label);
-        Serial.print(" -> ecran ");
-        Serial.println(mainButtons[i].screen);
+
+        // ----------------------------------------------------
+        // DETAIL UNIQUEMENT NIVEAU 2
+        // ----------------------------------------------------
+
+        LOG_MAIN_DETAIL("[MAIN] Bouton ");
+        LOG_MAIN_DETAIL(i);
+
+        LOG_MAIN_DETAIL(" : ");
+        LOG_MAIN_DETAIL(mainButtons[i].label);
+
+        LOG_MAIN_DETAIL(" -> ecran ");
+        LOGLN_MAIN_DETAIL(mainButtons[i].screen);
     }
 
-    Serial.println("[MAIN] Page MAIN affichee");
+
+    LOGLN_MAIN(
+        "[MAIN] Page MAIN affichee"
+    );
 }
 
-void mainScreenLoop(TFT_eSPI &tft)
+
+// ============================================================
+// LOOP MAIN
+// ============================================================
+
+void mainScreenLoop(
+    TFT_eSPI &tft
+)
 {
+    (void)tft;
 }
+
+
+// ============================================================
+// TOUCH MAIN
+// ============================================================
 
 bool mainScreenTouch(
     int16_t x,
@@ -136,19 +221,45 @@ bool mainScreenTouch(
     uint8_t &screen
 )
 {
-    Serial.print("[MAIN] Analyse clic X=");
-    Serial.print(x);
-    Serial.print(" Y=");
-    Serial.println(y);
+    // --------------------------------------------------------
+    // LOG IMPORTANT
+    // --------------------------------------------------------
 
-    for (uint8_t i = 0; i < MAIN_BUTTON_COUNT; i++)
+    LOG_MAIN("[MAIN] Touch X=");
+    LOG_MAIN(x);
+
+    LOG_MAIN(" Y=");
+    LOGLN_MAIN(y);
+
+
+    // --------------------------------------------------------
+    // TEST BOUTONS
+    // --------------------------------------------------------
+
+    for (
+        uint8_t i = 0;
+        i < MAIN_BUTTON_COUNT;
+        i++
+    )
     {
-        const MainButton &button = mainButtons[i];
+        const MainButton &button =
+            mainButtons[i];
 
-        Serial.print("[MAIN] Test bouton ");
-        Serial.print(i);
-        Serial.print(" : ");
-        Serial.println(button.label);
+
+        // ----------------------------------------------------
+        // LOG COMPLET
+        // ----------------------------------------------------
+
+        LOG_MAIN_DETAIL("[MAIN] Test bouton ");
+        LOG_MAIN_DETAIL(i);
+
+        LOG_MAIN_DETAIL(" : ");
+        LOGLN_MAIN_DETAIL(button.label);
+
+
+        // ----------------------------------------------------
+        // TEST COORDONNEES
+        // ----------------------------------------------------
 
         if (
             x >= button.x &&
@@ -159,26 +270,27 @@ bool mainScreenTouch(
         {
             screen = button.screen;
 
-            Serial.println("----------------------------------------");
-            Serial.print("[MAIN] >>> BOUTON CLIQUE : ");
-            Serial.println(button.label);
 
-            Serial.print("[MAIN] X = ");
-            Serial.println(x);
+            LOG_MAIN("[MAIN] Bouton : ");
+            LOG_MAIN(button.label);
 
-            Serial.print("[MAIN] Y = ");
-            Serial.println(y);
+            LOG_MAIN(" -> ecran ");
+            LOGLN_MAIN(screen);
 
-            Serial.print("[MAIN] ECRAN CIBLE = ");
-            Serial.println(screen);
-
-            Serial.println("----------------------------------------");
 
             return true;
         }
     }
 
-    Serial.println("[MAIN] Aucun bouton correspondant");
+
+    // --------------------------------------------------------
+    // AUCUN BOUTON
+    // --------------------------------------------------------
+
+    LOGLN_MAIN(
+        "[MAIN] Aucun bouton correspondant"
+    );
+
 
     return false;
 }
