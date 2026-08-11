@@ -3,10 +3,8 @@
 
 // ============================================================
 // 3x0c3t BO4RD
-// CONFIGURATION STANDARD DE L'INTERFACE TFT
-//
-// Resolution : 240 x 320
-// Toutes les pages utilisent les memes zones.
+// STANDARD UI
+// TFT 240 x 320
 // ============================================================
 
 
@@ -23,159 +21,117 @@
 // ============================================================
 // HEADER
 // ============================================================
-//
-// Zone commune a toutes les pages.
-//
-// Y = 0
-// Hauteur = 40
-//
-// +----------------------------------------+
-// | HEADER                                 |
-// +----------------------------------------+
-//
 
 #define UI_HEADER_X            0
 #define UI_HEADER_Y            0
 #define UI_HEADER_WIDTH        TFT_SCREEN_WIDTH
-#define UI_HEADER_HEIGHT       40
+#define UI_HEADER_HEIGHT       32
 
 
 // ============================================================
-// HEURE
+// DATE / HEURE
 // ============================================================
 
-#define UI_TIME_X              5
-#define UI_TIME_Y              5
-
-
-// ============================================================
-// DATE
-// ============================================================
-
-#define UI_DATE_X              5
-#define UI_DATE_Y              22
+#define UI_DATETIME_X          4
+#define UI_DATETIME_Y          16
 
 
 // ============================================================
-// INDICATEURS SYSTEME
+// INDICATEURS
 // ============================================================
-//
-// Zone reservee a droite du header.
-//
-// Exemple futur :
-// WiFi / SD / Touch / Batterie / etc.
-//
 
-#define UI_STATUS_X            175
-#define UI_STATUS_Y            5
-#define UI_STATUS_WIDTH        60
-#define UI_STATUS_HEIGHT       30
+#define UI_STATUS_COUNT        4
+
+#define UI_STATUS_SIZE         10
+#define UI_STATUS_GAP          4
+
+#define UI_STATUS_AREA_WIDTH   \
+    ((UI_STATUS_COUNT * UI_STATUS_SIZE) + \
+     ((UI_STATUS_COUNT - 1) * UI_STATUS_GAP))
+
+#define UI_STATUS_X            \
+    (TFT_SCREEN_WIDTH - UI_STATUS_AREA_WIDTH - 4)
+
+#define UI_STATUS_Y            11
 
 
 // ============================================================
-// SEPARATEUR HEADER
+// SEPARATION HEADER
 // ============================================================
 
 #define UI_HEADER_SEPARATOR_X       0
-#define UI_HEADER_SEPARATOR_Y       40
+#define UI_HEADER_SEPARATOR_Y       32
 #define UI_HEADER_SEPARATOR_WIDTH   TFT_SCREEN_WIDTH
 #define UI_HEADER_SEPARATOR_HEIGHT  1
 
 
 // ============================================================
-// BARRE DE CHARGEMENT
+// BARRE DE LOADING
 // ============================================================
-//
-// Barre commune a toutes les pages.
-//
-// Y = 41
-// Hauteur = 4
-//
-// Progression : 0 -> 100
-//
 
 #define UI_LOADING_X           0
-#define UI_LOADING_Y           41
+#define UI_LOADING_Y           34
 #define UI_LOADING_WIDTH       TFT_SCREEN_WIDTH
 #define UI_LOADING_HEIGHT      4
 
 
 // ============================================================
-// ESPACE ENTRE BARRE ET TITRE
+// SEPARATION LOADING
 // ============================================================
 
-#define UI_TITLE_TOP           49
+#define UI_LOADING_SEPARATOR_X       0
+#define UI_LOADING_SEPARATOR_Y       39
+#define UI_LOADING_SEPARATOR_WIDTH   TFT_SCREEN_WIDTH
+#define UI_LOADING_SEPARATOR_HEIGHT  1
 
 
 // ============================================================
-// TITRE DE PAGE
+// TITRE PAGE
 // ============================================================
-//
-// Zone commune a toutes les pages.
-//
 
 #define UI_TITLE_X             0
-#define UI_TITLE_Y             49
+#define UI_TITLE_Y             40
 #define UI_TITLE_WIDTH         TFT_SCREEN_WIDTH
-#define UI_TITLE_HEIGHT        30
+#define UI_TITLE_HEIGHT        24
 
 
 // ============================================================
-// SEPARATEUR TITRE
+// SEPARATION TITRE
 // ============================================================
 
 #define UI_TITLE_SEPARATOR_X       0
-#define UI_TITLE_SEPARATOR_Y       79
+#define UI_TITLE_SEPARATOR_Y       64
 #define UI_TITLE_SEPARATOR_WIDTH   TFT_SCREEN_WIDTH
 #define UI_TITLE_SEPARATOR_HEIGHT  1
 
 
 // ============================================================
-// ZONE DE CONTENU
+// CONTENU
 // ============================================================
-//
-// C'est ici que les pages dessinent leur contenu.
-//
-// Une page ne doit pas modifier ces coordonnees.
-//
 
 #define UI_CONTENT_X           0
-#define UI_CONTENT_Y           80
+#define UI_CONTENT_Y           65
 #define UI_CONTENT_WIDTH       TFT_SCREEN_WIDTH
-#define UI_CONTENT_HEIGHT      220
+#define UI_CONTENT_HEIGHT      \
+    (TFT_SCREEN_HEIGHT - UI_CONTENT_Y)
 
 
 // ============================================================
-// FOOTER
-// ============================================================
-//
-// Zone commune reservee au bas de l'ecran.
-//
-
-#define UI_FOOTER_X            0
-#define UI_FOOTER_Y            300
-#define UI_FOOTER_WIDTH        TFT_SCREEN_WIDTH
-#define UI_FOOTER_HEIGHT       20
-
-
-// ============================================================
-// COULEURS INTERFACE
+// COULEURS
 // ============================================================
 
 #define UI_BACKGROUND_COLOR    TFT_BLACK
-
-#define UI_HEADER_COLOR        TFT_BLACK
 
 #define UI_SEPARATOR_COLOR     TFT_CYAN
 
 #define UI_LOADING_BACKGROUND  TFT_DARKGREY
 #define UI_LOADING_COLOR       TFT_CYAN
 
+#define UI_HEADER_TEXT_COLOR   TFT_WHITE
 #define UI_TITLE_COLOR         TFT_WHITE
 
-#define UI_CONTENT_COLOR       TFT_WHITE
-
-#define UI_FOOTER_COLOR        TFT_BLACK
+#define UI_STATUS_OFF_COLOR   TFT_DARKGREY
+#define UI_STATUS_ON_COLOR    TFT_GREEN
 
 
 #endif

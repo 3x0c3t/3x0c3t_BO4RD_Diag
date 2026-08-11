@@ -2,7 +2,6 @@
 #include <TFT_eSPI.h>
 
 #include "display_config.h"
-#include "personalization.h"
 #include "display.h"
 #include "main_screen.h"
 
@@ -14,14 +13,11 @@
 void mainScreenInit(TFT_eSPI &tft)
 {
     // Rien pour le moment.
-    //
-    // L'initialisation commune de l'affichage
-    // est geree par displayInit().
 }
 
 
 // ============================================================
-// AFFICHAGE ECRAN PRINCIPAL
+// ECRAN PRINCIPAL
 // ============================================================
 
 void mainScreenShow(TFT_eSPI &tft)
@@ -29,9 +25,6 @@ void mainScreenShow(TFT_eSPI &tft)
     // ========================================================
     // CADRE COMMUN
     // ========================================================
-    //
-    // Toutes les pages utilisent exactement le meme cadre.
-    //
 
     displayDrawFrame(
         tft,
@@ -41,19 +34,12 @@ void mainScreenShow(TFT_eSPI &tft)
 
 
     // ========================================================
-    // CONTENU DE LA PAGE
+    // CONTENU PAGE
     // ========================================================
-    //
-    // Tout ce qui suit appartient exclusivement
-    // a la page MAIN.
-    //
-    // La page commence a UI_CONTENT_Y.
-    //
 
     const int centerX =
         UI_CONTENT_X +
         (UI_CONTENT_WIDTH / 2);
-
 
     const int centerY =
         UI_CONTENT_Y +
@@ -70,6 +56,7 @@ void mainScreenShow(TFT_eSPI &tft)
     );
 
     tft.setTextDatum(MC_DATUM);
+
     tft.setTextSize(2);
 
     tft.drawString(
@@ -94,7 +81,7 @@ void mainScreenShow(TFT_eSPI &tft)
 
 
 // ============================================================
-// LOOP ECRAN PRINCIPAL
+// LOOP
 // ============================================================
 
 void mainScreenLoop(TFT_eSPI &tft)

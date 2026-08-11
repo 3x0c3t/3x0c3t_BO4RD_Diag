@@ -19,82 +19,63 @@ void displayInit(TFT_eSPI &tft)
 // ============================================================
 // HEADER
 // ============================================================
+//
+// HH:MM:SS - AAAA/MM/JJ                □ □ □ □
+//
+// Les donnees reelles heure/date seront ajoutees plus tard.
+// Pour le moment, affichage de placeholders.
+// ============================================================
 
 void displayDrawHeader(TFT_eSPI &tft)
 {
+    // --------------------------------------------------------
+    // Fond du header
+    // --------------------------------------------------------
+
     tft.fillRect(
         UI_HEADER_X,
         UI_HEADER_Y,
         UI_HEADER_WIDTH,
         UI_HEADER_HEIGHT,
-        UI_HEADER_COLOR
+        UI_BACKGROUND_COLOR
     );
 
 
     // --------------------------------------------------------
-    // HEURE
+    // Date / heure
     // --------------------------------------------------------
-    //
-    // Placeholder temporaire.
-    // La vraie horloge sera ajoutee plus tard.
-    //
 
     tft.setTextColor(
-        TFT_WHITE,
-        UI_HEADER_COLOR
+        UI_HEADER_TEXT_COLOR,
+        UI_BACKGROUND_COLOR
     );
 
-    tft.setTextDatum(TL_DATUM);
+    tft.setTextDatum(ML_DATUM);
     tft.setTextSize(1);
 
     tft.drawString(
-        "--:--",
-        UI_TIME_X,
-        UI_TIME_Y
+        "--:--:-- - ----/--/--",
+        UI_DATETIME_X,
+        UI_DATETIME_Y
     );
 
 
     // --------------------------------------------------------
-    // DATE
+    // Indicateurs systeme
     // --------------------------------------------------------
-    //
-    // Placeholder temporaire.
-    //
 
-    tft.drawString(
-        "--/--/----",
-        UI_DATE_X,
-        UI_DATE_Y
-    );
-
-
-    // --------------------------------------------------------
-    // INDICATEURS SYSTEME
-    // --------------------------------------------------------
-    //
-    // Reserve pour les futurs indicateurs :
-    //
-    // WiFi
-    // SD
-    // Touch
-    // Batterie
-    //
-    // Pour l'instant : petits carres de reservation.
-    //
-
-    int x = UI_STATUS_X;
-
-    const int size = 8;
-    const int gap  = 4;
-
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < UI_STATUS_COUNT; i++)
     {
+        int x =
+            UI_STATUS_X +
+            (i * (UI_STATUS_SIZE + UI_STATUS_GAP));
+
         tft.drawRect(
-            x + (i * (size + gap)),
+            x,
             UI_STATUS_Y,
-            size,
-            size,
-            TFT_DARKGREY
+            UI_STATUS_SIZE,
+            UI_STATUS_SIZE,
+            UI_STATUS_OFF_COLOR
         );
     }
 }
@@ -117,7 +98,10 @@ void displayDrawHeaderSeparator(TFT_eSPI &tft)
 
 
 // ============================================================
-// BARRE DE CHARGEMENT
+// BARRE DE LOADING
+// ============================================================
+//
+// progress : 0 -> 100
 // ============================================================
 
 void displayDrawLoadingBar(
@@ -149,16 +133,12 @@ void displayDrawLoadingBar(
 
 
     // --------------------------------------------------------
-    // Largeur progression
+    // Progression
     // --------------------------------------------------------
 
     uint16_t progressWidth =
         (UI_LOADING_WIDTH * progress) / 100;
 
-
-    // --------------------------------------------------------
-    // Progression
-    // --------------------------------------------------------
 
     if (progressWidth > 0)
     {
@@ -174,7 +154,26 @@ void displayDrawLoadingBar(
 
 
 // ============================================================
+// SEPARATEUR LOADING
+// ============================================================
+
+void displayDrawLoadingSeparator(TFT_eSPI &tft)
+{
+    tft.fillRect(
+        UI_LOADING_SEPARATOR_X,
+        UI_LOADING_SEPARATOR_Y,
+        UI_LOADING_SEPARATOR_WIDTH,
+        UI_LOADING_SEPARATOR_HEIGHT,
+        UI_SEPARATOR_COLOR
+    );
+}
+
+
+// ============================================================
 // TITRE PAGE
+// ============================================================
+//
+// Petit titre centre dans sa zone.
 // ============================================================
 
 void displayDrawPageTitle(
@@ -182,6 +181,10 @@ void displayDrawPageTitle(
     const char *title
 )
 {
+    // --------------------------------------------------------
+    // Zone titre
+    // --------------------------------------------------------
+
     tft.fillRect(
         UI_TITLE_X,
         UI_TITLE_Y,
@@ -191,14 +194,19 @@ void displayDrawPageTitle(
     );
 
 
+    // --------------------------------------------------------
+    // Texte
+    // --------------------------------------------------------
+
     tft.setTextColor(
         UI_TITLE_COLOR,
         UI_BACKGROUND_COLOR
     );
 
     tft.setTextDatum(MC_DATUM);
-    tft.setTextSize(2);
 
+    // Petit titre
+    tft.setTextSize(1);
 
     tft.drawString(
         title,
@@ -225,38 +233,20 @@ void displayDrawTitleSeparator(TFT_eSPI &tft)
 
 
 // ============================================================
-// FOOTER
+// CADRE COMMUN
 // ============================================================
-
-void displayDrawFooter(TFT_eSPI &tft)
-{
-    tft.fillRect(
-        UI_FOOTER_X,
-        UI_FOOTER_Y,
-        UI_FOOTER_WIDTH,
-        UI_FOOTER_HEIGHT,
-        UI_FOOTER_COLOR
-    );
-
-
-    tft.setTextColor(
-        TFT_DARKGREY,
-        UI_FOOTER_COLOR
-    );
-
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextSize(1);
-
-    tft.drawString(
-        "3x0c3t BO4RD",
-        UI_FOOTER_X + (UI_FOOTER_WIDTH / 2),
-        UI_FOOTER_Y + (UI_FOOTER_HEIGHT / 2)
-    );
-}
-
-
-// ============================================================
-// CADRE COMPLET
+//
+// Structure commune a toutes les pages :
+//
+// HEADER
+// SEPARATEUR
+// LOADING
+// SEPARATEUR
+// TITRE
+// SEPARATEUR
+// CONTENU
+//
+// Aucun footer.
 // ============================================================
 
 void displayDrawFrame(
@@ -266,28 +256,28 @@ void displayDrawFrame(
 )
 {
     // --------------------------------------------------------
-    // Fond
+    // Fond complet
     // --------------------------------------------------------
 
     tft.fillScreen(UI_BACKGROUND_COLOR);
 
 
     // --------------------------------------------------------
-    // Header
+    // HEADER
     // --------------------------------------------------------
 
     displayDrawHeader(tft);
 
 
     // --------------------------------------------------------
-    // Ligne Header
+    // SEPARATEUR HEADER
     // --------------------------------------------------------
 
     displayDrawHeaderSeparator(tft);
 
 
     // --------------------------------------------------------
-    // Barre de chargement
+    // BARRE LOADING
     // --------------------------------------------------------
 
     displayDrawLoadingBar(
@@ -297,7 +287,14 @@ void displayDrawFrame(
 
 
     // --------------------------------------------------------
-    // Titre
+    // SEPARATEUR LOADING
+    // --------------------------------------------------------
+
+    displayDrawLoadingSeparator(tft);
+
+
+    // --------------------------------------------------------
+    // TITRE
     // --------------------------------------------------------
 
     displayDrawPageTitle(
@@ -307,25 +304,25 @@ void displayDrawFrame(
 
 
     // --------------------------------------------------------
-    // Ligne titre
+    // SEPARATEUR TITRE
     // --------------------------------------------------------
 
     displayDrawTitleSeparator(tft);
-
-
-    // --------------------------------------------------------
-    // Footer
-    // --------------------------------------------------------
-
-    displayDrawFooter(tft);
 }
 
 
 // ============================================================
 // COMPATIBILITE ANCIENNE API
 // ============================================================
+//
+// Conserve cette fonction pour eviter de casser d'eventuels
+// appels encore presents dans le projet.
+// ============================================================
 
 void displayDrawSystemBar(TFT_eSPI &tft)
 {
-    displayDrawLoadingBar(tft, 100);
+    displayDrawLoadingBar(
+        tft,
+        100
+    );
 }
