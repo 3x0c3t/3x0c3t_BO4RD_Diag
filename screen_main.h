@@ -1,5 +1,5 @@
-#ifndef MAIN_SCREEN_H
-#define MAIN_SCREEN_H
+#ifndef SCREEN_MAIN_H
+#define SCREEN_MAIN_H
 
 #include <TFT_eSPI.h>
 

@@ -5,17 +5,9 @@
 #include "config.h"
 #include "display_config.h"
 #include "personalization.h"
-
 #include "display.h"
 #include "splash.h"
-#include "main_screen.h"
-
-// MODULES DESACTIVEES
-// #include "touch.h"
-// #include "sd_diag.h"
-// #include "wifi_diag.h"
-// #include "system_diag.h"
-// #include "diagnostics.h"
+#include "screen_main.h"
 
 // ============================================================
 // TFT
@@ -23,13 +15,24 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
+
+// ============================================================
+// ECRAN ACTUEL
+// ============================================================
+
+uint8_t currentScreen = 0;
+
+
 // ============================================================
 // SETUP
 // ============================================================
 
 void setup()
 {
+    // --------------------------------------------------------
     // SERIAL
+    // --------------------------------------------------------
+
     Serial.begin(115200);
     delay(500);
 
@@ -40,55 +43,69 @@ void setup()
     Serial.println("========================================");
     Serial.println();
 
+
+    // --------------------------------------------------------
     // SPI
+    // --------------------------------------------------------
+
     SPI.begin();
+
     Serial.println("[BOOT] SPI initialise");
 
+
+    // --------------------------------------------------------
     // DISPLAY
+    // --------------------------------------------------------
+
     Serial.println("[BOOT] Initialisation display...");
+
     displayInit(tft);
+
     Serial.println("[BOOT] Display initialise");
 
+
+    // --------------------------------------------------------
     // SPLASH
+    // --------------------------------------------------------
+
     Serial.println("[BOOT] Affichage splash...");
+
     splashInit(tft);
     splashShow(tft);
     splashWait();
+
     Serial.println("[BOOT] Splash termine");
 
-    // ========================================================
-    // TRANSITION SPLASH -> MAIN
-    // ========================================================
+
+    // --------------------------------------------------------
+    // MAIN
+    // --------------------------------------------------------
 
     Serial.println("[BOOT] Passage ecran principal...");
 
-    tft.fillScreen(TFT_BLACK);
+    currentScreen = 0;
 
-    displayDrawSystemBar(tft);
+    mainScreenInit(tft);
     mainScreenShow(tft);
 
     Serial.println("[BOOT] Ecran principal affiche");
 
-    // ========================================================
-    // MODULES DESACTIVEES
-    // ========================================================
 
-    Serial.println();
-    Serial.println("[BOOT] Modules supplementaires desactives");
-    Serial.println("[BOOT] TOUCH : OFF");
-    Serial.println("[BOOT] SD    : OFF");
-    Serial.println("[BOOT] WIFI  : OFF");
-    Serial.println("[BOOT] SYSTEM: OFF");
-    Serial.println("[BOOT] DIAG  : OFF");
-
-    // ========================================================
+    // --------------------------------------------------------
     // FIN BOOT
-    // ========================================================
+    // --------------------------------------------------------
 
     Serial.println();
+    Serial.println("[BOOT] MAIN : OK");
+    Serial.println("[BOOT] BOUTONS : 5");
+    Serial.println("[BOOT] COLONNE UNIQUE");
+    Serial.println("[BOOT] TOUCH : PRET POUR NAVIGATION");
+    Serial.println();
+
     Serial.println("=== BOOT TERMINE ===");
     Serial.println();
 }
+
 
 // ============================================================
 // LOOP
@@ -96,7 +113,14 @@ void setup()
 
 void loop()
 {
-    // Aucun module actif pour le moment.
+    // --------------------------------------------------------
+    // MAIN
+    // --------------------------------------------------------
+
+    if (currentScreen == 0)
+    {
+        mainScreenLoop(tft);
+    }
 
     delay(10);
 }
