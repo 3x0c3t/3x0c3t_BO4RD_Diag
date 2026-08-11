@@ -11,37 +11,96 @@ void splashShow(TFT_eSPI &tft)
 {
     tft.fillScreen(SPLASH_BACKGROUND);
 
-    tft.setTextColor(SPLASH_TEXT_COLOR, SPLASH_BACKGROUND);
+    // --------------------------------------------------------
+    // BRAND
+    // --------------------------------------------------------
+
     tft.setTextDatum(MC_DATUM);
-
-    tft.setTextSize(3);
-    tft.drawString(
-        SPLASH_TITLE,
-        TFT_WIDTH / 2,
-        110
+    tft.setTextSize(SPLASH_BRAND_SIZE);
+    tft.setTextColor(
+        SPLASH_BRAND_COLOR,
+        SPLASH_BACKGROUND
     );
 
-    tft.setTextSize(2);
     tft.drawString(
-        SPLASH_SUBTITLE,
+        SPLASH_BRAND,
         TFT_WIDTH / 2,
-        150
+        SPLASH_BRAND_Y
     );
 
-    tft.setTextSize(1);
-    tft.drawString(
-        SPLASH_VERSION,
-        TFT_WIDTH / 2,
-        190
+    // --------------------------------------------------------
+    // MOTTO
+    // --------------------------------------------------------
+
+    tft.setTextSize(SPLASH_MOTTO_SIZE);
+    tft.setTextColor(
+        SPLASH_MOTTO_COLOR,
+        SPLASH_BACKGROUND
     );
 
-    // BARRE SYSTEME | Position standardisee
+    tft.drawString(
+        SPLASH_MOTTO,
+        TFT_WIDTH / 2,
+        SPLASH_MOTTO_Y
+    );
+
+    // --------------------------------------------------------
+    // LIGNE DECORATIVE
+    // --------------------------------------------------------
+
     tft.fillRect(
-        SYSTEM_BAR_X,
-        SYSTEM_BAR_Y,
-        SYSTEM_BAR_WIDTH,
-        SYSTEM_BAR_HEIGHT,
-        SYSTEM_BAR_COLOR
+        (TFT_WIDTH - SPLASH_LINE_WIDTH) / 2,
+        SPLASH_LINE_Y,
+        SPLASH_LINE_WIDTH,
+        SPLASH_LINE_HEIGHT,
+        SPLASH_LINE_COLOR
+    );
+
+    // --------------------------------------------------------
+    // PROJECT
+    // --------------------------------------------------------
+
+    tft.setTextSize(SPLASH_PROJECT_SIZE);
+    tft.setTextColor(
+        SPLASH_PROJECT_COLOR,
+        SPLASH_BACKGROUND
+    );
+
+    tft.drawString(
+        SPLASH_PROJECT,
+        TFT_WIDTH / 2,
+        SPLASH_PROJECT_Y
+    );
+
+    // --------------------------------------------------------
+    // VERSION
+    // --------------------------------------------------------
+
+    tft.setTextSize(SPLASH_VERSION_SIZE);
+    tft.setTextColor(
+        SPLASH_VERSION_COLOR,
+        SPLASH_BACKGROUND
+    );
+
+    tft.drawString(
+        DEVICE_VERSION,
+        TFT_WIDTH / 2,
+        SPLASH_VERSION_Y
+    );
+
+    // --------------------------------------------------------
+    // DATE DE COMPILATION
+    // --------------------------------------------------------
+
+    tft.setTextColor(
+        SPLASH_DATE_COLOR,
+        SPLASH_BACKGROUND
+    );
+
+    tft.drawString(
+        __DATE__,
+        TFT_WIDTH / 2,
+        SPLASH_DATE_Y
     );
 }
 
