@@ -2,13 +2,11 @@
 #define SCREEN_TACTILE_H
 
 #include <Arduino.h>
-#include <TFT_eSPI.h>
-#include <XPT2046_Touchscreen.h>
 
 #define TOUCH_CS 0
-#define TOUCH_IRQ 5
 
 void touchInit();
+
 bool touchAvailable();
 
 bool touchRead(

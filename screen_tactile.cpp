@@ -4,25 +4,60 @@
 
 #include "screen_tactile.h"
 
-static XPT2046_Touchscreen touch(TOUCH_CS, TOUCH_IRQ);
+static XPT2046_Touchscreen touch(TOUCH_CS);
 
 static bool touchInitialized = false;
 
 void touchInit()
 {
     Serial.println();
-    Serial.println("[TOUCH] Initialisation XPT2046...");
-    Serial.print("[TOUCH] CS  = GPIO");
-    Serial.println(TOUCH_CS);
-    Serial.print("[TOUCH] IRQ = GPIO");
-    Serial.println(TOUCH_IRQ);
+    Serial.println("========================================");
+    Serial.println("[TOUCH] TEST SPI XPT2046");
+    Serial.println("========================================");
+
+    Serial.println("[TOUCH] Brochage utilise :");
+    Serial.println("[TOUCH] CS   = GPIO0  / D3");
+    Serial.println("[TOUCH] SCK  = GPIO14 / D5");
+    Serial.println("[TOUCH] MOSI = GPIO13 / D7");
+    Serial.println("[TOUCH] MISO = GPIO12 / D6");
+
+    // --------------------------------------------------------
+    // DESACTIVATION TFT
+    // --------------------------------------------------------
+
+    // TFT CS = GPIO15 / D8
+    pinMode(15, OUTPUT);
+    digitalWrite(15, HIGH);
+
+    Serial.println("[TOUCH] TFT CS force HIGH");
+
+    // --------------------------------------------------------
+    // TOUCH CS
+    // --------------------------------------------------------
+
+    pinMode(TOUCH_CS, OUTPUT);
+    digitalWrite(TOUCH_CS, HIGH);
+
+    Serial.println("[TOUCH] Touch CS configure");
+
+    // --------------------------------------------------------
+    // SPI
+    // --------------------------------------------------------
+
+    SPI.begin();
+
+    Serial.println("[TOUCH] SPI.begin()");
+
+    // --------------------------------------------------------
+    // XPT2046
+    // --------------------------------------------------------
 
     touch.begin();
 
     touchInitialized = true;
 
-    Serial.println("[TOUCH] XPT2046 initialise");
-    Serial.println("[TOUCH] Touch pret");
+    Serial.println("[TOUCH] touch.begin() OK");
+    Serial.println("========================================");
     Serial.println();
 }
 
@@ -54,55 +89,24 @@ bool touchRead(
 
     TS_Point p = touch.getPoint();
 
-    int16_t rawX = p.x;
-    int16_t rawY = p.y;
+    Serial.println();
+    Serial.println("[TOUCH] ================================");
+    Serial.println("[TOUCH] LECTURE XPT2046");
 
+    Serial.print("[TOUCH] RAW X = ");
+    Serial.println(p.x);
+
+    Serial.print("[TOUCH] RAW Y = ");
+    Serial.println(p.y);
+
+    Serial.print("[TOUCH] RAW Z = ");
+    Serial.println(p.z);
+
+    x = p.x;
+    y = p.y;
     pressure = p.z;
 
-    // --------------------------------------------------------
-    // CALIBRATION XPT2046
-    // A ajuster si necessaire apres test physique
-    // --------------------------------------------------------
-
-    const int16_t RAW_X_MIN = 200;
-    const int16_t RAW_X_MAX = 3900;
-
-    const int16_t RAW_Y_MIN = 200;
-    const int16_t RAW_Y_MAX = 3900;
-
-    x = map(
-        rawX,
-        RAW_X_MIN,
-        RAW_X_MAX,
-        0,
-        239
-    );
-
-    y = map(
-        rawY,
-        RAW_Y_MIN,
-        RAW_Y_MAX,
-        0,
-        319
-    );
-
-    x = constrain(x, 0, 239);
-    y = constrain(y, 0, 319);
-
-    Serial.print("[TOUCH] RAW X=");
-    Serial.print(rawX);
-
-    Serial.print(" Y=");
-    Serial.print(rawY);
-
-    Serial.print(" Z=");
-    Serial.print(pressure);
-
-    Serial.print(" -> SCREEN X=");
-    Serial.print(x);
-
-    Serial.print(" Y=");
-    Serial.println(y);
+    Serial.println("[TOUCH] ================================");
 
     return true;
 }
