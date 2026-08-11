@@ -8,9 +8,13 @@
 #include "display.h"
 #include "splash.h"
 #include "screen_main.h"
+#include "screen_systeme.h"
+#include "screen_tactile.h"
+#include "screen_wifi.h"
+
 #include "touch.h"
 #include "wifi_diag.h"
-#include "screen_wifi.h"
+
 
 // ============================================================
 // TFT

@@ -4,22 +4,20 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 
-void wifiScreenInit(
-    TFT_eSPI &tft
-);
+// ============================================================
+// ÉCRAN WI-FI
+// ============================================================
 
-void wifiScreenShow(
-    TFT_eSPI &tft
-);
+void wifiScreenInit(TFT_eSPI &tft);
 
-void wifiScreenLoop(
-    TFT_eSPI &tft
-);
+void wifiScreenShow(TFT_eSPI &tft);
+
+void wifiScreenLoop(TFT_eSPI &tft);
 
 bool wifiScreenTouch(
     int16_t x,
     int16_t y,
-    uint8_t &screen
+    uint8_t &newScreen
 );
 
 #endif
