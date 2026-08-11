@@ -6,16 +6,13 @@
 
 // ============================================================
 // 3x0c3t BO4RD
-// TOUCH XPT2046
+// XPT2046 TOUCH
 // ============================================================
 
-// XPT2046 CS
-#define BO4RD_TOUCH_CS    0
-
-// SPI matériel ESP8266
-#define BO4RD_TOUCH_SCK   14
-#define BO4RD_TOUCH_MOSI  13
-#define BO4RD_TOUCH_MISO  12
+#define BO4RD_TOUCH_CS   0
+#define BO4RD_TOUCH_SCK  14
+#define BO4RD_TOUCH_MOSI 13
+#define BO4RD_TOUCH_MISO 12
 
 // ============================================================
 // API

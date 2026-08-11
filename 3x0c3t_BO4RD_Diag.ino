@@ -11,10 +11,7 @@
 #include "screen_systeme.h"
 #include "touch.h"
 #include "screen_wifi.h"
-
-#include "touch.h"
 #include "wifi_diag.h"
-#include "screen_wifi.h"
 #include "debug.h"
 
 // ============================================================
@@ -61,12 +58,46 @@ const char* screenName(uint8_t screen)
 }
 
 // ============================================================
+// AFFICHAGE EVENEMENT TOUCH
+// ============================================================
+
+void logTouchEvent(
+    uint8_t screenBefore,
+    uint8_t screenAfter,
+    int16_t x,
+    int16_t y,
+    uint16_t z
+)
+{
+    Serial.println();
+    Serial.println("========================================");
+
+    Serial.print("# ECRAN : [");
+    Serial.print(screenName(screenBefore));
+
+    Serial.print("] - [EVENT] [TOUCH] sur (");
+    Serial.print(screenName(screenAfter));
+
+    Serial.print(") X : ");
+    Serial.print(x);
+
+    Serial.print(" Y : ");
+    Serial.print(y);
+
+    Serial.print(" Z : ");
+    Serial.println(z);
+
+    Serial.println("========================================");
+}
+
+// ============================================================
 // SETUP
 // ============================================================
 
 void setup()
 {
     Serial.begin(115200);
+
     delay(500);
 
     Serial.println();
@@ -123,7 +154,9 @@ void setup()
     Serial.println("[BOOT] Affichage splash...");
 
     splashInit(tft);
+
     splashShow(tft);
+
     splashWait();
 
     Serial.println("[BOOT] Splash termine");
@@ -178,25 +211,10 @@ void loop()
 
     if (touchRead(tft, x, y, z))
     {
-        Serial.println();
-        Serial.println("========================================");
-        Serial.println("[EVENT] NOUVEAU TOUCH");
-        Serial.println("========================================");
+        uint8_t screenBefore = currentScreen;
+        uint8_t newScreen = currentScreen;
 
-        Serial.print("[EVENT] Ecran actuel : ");
-        Serial.print(screenName(currentScreen));
-        Serial.print(" (");
-        Serial.print(currentScreen);
-        Serial.println(")");
-
-        Serial.print("[EVENT] X : ");
-        Serial.println(x);
-
-        Serial.print("[EVENT] Y : ");
-        Serial.println(y);
-
-        Serial.print("[EVENT] Pression : ");
-        Serial.println(z);
+        bool handled = false;
 
         // ----------------------------------------------------
         // MAIN
@@ -204,43 +222,11 @@ void loop()
 
         if (currentScreen == 0)
         {
-            uint8_t newScreen = currentScreen;
-
-            if (
-                mainScreenTouch(
-                    x,
-                    y,
-                    newScreen
-                )
-            )
-            {
-                currentScreen = newScreen;
-
-                Serial.print("[EVENT] Navigation vers : ");
-                Serial.print(screenName(currentScreen));
-                Serial.print(" (");
-                Serial.print(currentScreen);
-                Serial.println(")");
-
-                // ------------------------------------------------
-                // WI-FI
-                // ------------------------------------------------
-
-                if (currentScreen == 2)
-                {
-                    Serial.println(
-                        "[EVENT] Ouverture ecran WI-FI"
-                    );
-
-                    wifiScreenShow(tft);
-                }
-            }
-            else
-            {
-                Serial.println(
-                    "[EVENT] Touch MAIN non traite"
-                );
-            }
+            handled = mainScreenTouch(
+                x,
+                y,
+                newScreen
+            );
         }
 
         // ----------------------------------------------------
@@ -249,18 +235,11 @@ void loop()
 
         else if (currentScreen == 1)
         {
-            Serial.print("[EVENT] Touch sur : ");
-            Serial.print(screenName(currentScreen));
-            Serial.print(" (");
-            Serial.print(currentScreen);
-            Serial.println(")");
-
-            Serial.print("[SYSTEME] X=");
-            Serial.print(x);
-            Serial.print(" Y=");
-            Serial.println(y);
-
-            // Navigation SYSTEME à ajouter ici
+            handled = systemeScreenTouch(
+                x,
+                y,
+                newScreen
+            );
         }
 
         // ----------------------------------------------------
@@ -269,75 +248,86 @@ void loop()
 
         else if (currentScreen == 2)
         {
-            uint8_t newScreen = currentScreen;
+            handled = wifiScreenTouch(
+                x,
+                y,
+                newScreen
+            );
+        }
 
-            Serial.print("[WIFI] Touch X=");
-            Serial.print(x);
-            Serial.print(" Y=");
-            Serial.println(y);
+        // ----------------------------------------------------
+        // ECRAN NON GERE
+        // ----------------------------------------------------
 
-            if (
-                wifiScreenTouch(
-                    x,
-                    y,
-                    newScreen
-                )
-            )
+        else
+        {
+            handled = false;
+        }
+
+        // ----------------------------------------------------
+        // LOG UNIQUE
+        // ----------------------------------------------------
+
+        logTouchEvent(
+            screenBefore,
+            newScreen,
+            x,
+            y,
+            z
+        );
+
+        // ----------------------------------------------------
+        // NAVIGATION
+        // ----------------------------------------------------
+
+        if (handled)
+        {
+            currentScreen = newScreen;
+
+            // ------------------------------------------------
+            // CHANGEMENT D'ECRAN
+            // ------------------------------------------------
+
+            if (currentScreen != screenBefore)
             {
-                currentScreen = newScreen;
-
-                Serial.print("[EVENT] Ecran apres touch Wi-Fi : ");
-                Serial.print(screenName(currentScreen));
-                Serial.print(" (");
-                Serial.print(currentScreen);
-                Serial.println(")");
-
-                // ------------------------------------------------
-                // RETOUR MAIN
-                // ------------------------------------------------
-
                 if (currentScreen == 0)
                 {
-                    Serial.println(
-                        "[EVENT] Retour ecran MAIN"
-                    );
-
                     tft.fillScreen(TFT_BLACK);
 
                     displayDrawSystemBar(tft);
 
                     mainScreenShow(tft);
                 }
-                else
+                else if (currentScreen == 1)
+                {
+                    tft.fillScreen(TFT_BLACK);
+
+                    displayDrawSystemBar(tft);
+
+                    systemeScreenShow(tft);
+                }
+                else if (currentScreen == 2)
+                {
+                    tft.fillScreen(TFT_BLACK);
+
+                    displayDrawSystemBar(tft);
+
+                    wifiScreenShow(tft);
+                }
+            }
+
+            // ------------------------------------------------
+            // MEME ECRAN
+            // ------------------------------------------------
+
+            else
+            {
+                if (currentScreen == 2)
                 {
                     wifiScreenShow(tft);
                 }
             }
-            else
-            {
-                Serial.println(
-                    "[EVENT] Touch Wi-Fi non traite"
-                );
-            }
         }
-
-        // ----------------------------------------------------
-        // AUTRES ECRANS
-        // ----------------------------------------------------
-
-        else
-        {
-            Serial.print("[EVENT] Ecran non gere : ");
-            Serial.print(screenName(currentScreen));
-            Serial.print(" (");
-            Serial.print(currentScreen);
-            Serial.println(")");
-        }
-
-        Serial.println(
-            "========================================"
-        );
-        Serial.println();
     }
 
     // --------------------------------------------------------
@@ -348,6 +338,10 @@ void loop()
     {
         wifiScreenLoop(tft);
     }
+
+    // --------------------------------------------------------
+    // PETITE PAUSE
+    // --------------------------------------------------------
 
     delay(10);
 }
