@@ -5,21 +5,6 @@
 #include "display.h"
 #include "screen_main.h"
 
-
-// ============================================================
-// BOUTONS MAIN
-// ============================================================
-//
-// Une seule colonne.
-//
-// 1 : SYSTEME
-// 2 : WI-FI
-// 3 : CARTE SD
-// 4 : TACTILE
-// 5 : DIAGNOSTICS
-//
-// ============================================================
-
 static MainButton mainButtons[MAIN_BUTTON_COUNT] =
 {
     {
@@ -72,30 +57,15 @@ static MainButton mainButtons[MAIN_BUTTON_COUNT] =
     }
 };
 
-
-// ============================================================
-// INITIALISATION
-// ============================================================
-
 void mainScreenInit(TFT_eSPI &tft)
 {
-    // Rien de spécifique pour le moment.
 }
-
-
-// ============================================================
-// DESSIN D'UN BOUTON
-// ============================================================
 
 static void drawMainButton(
     TFT_eSPI &tft,
     const MainButton &button
 )
 {
-    // --------------------------------------------------------
-    // Fond du bouton
-    // --------------------------------------------------------
-
     tft.fillRect(
         button.x,
         button.y,
@@ -103,11 +73,6 @@ static void drawMainButton(
         button.height,
         TFT_BLACK
     );
-
-
-    // --------------------------------------------------------
-    // Contour
-    // --------------------------------------------------------
 
     tft.drawRect(
         button.x,
@@ -117,18 +82,12 @@ static void drawMainButton(
         TFT_CYAN
     );
 
-
-    // --------------------------------------------------------
-    // Texte
-    // --------------------------------------------------------
-
     tft.setTextColor(
         TFT_WHITE,
         TFT_BLACK
     );
 
     tft.setTextDatum(MC_DATUM);
-
     tft.setTextSize(2);
 
     tft.drawString(
@@ -138,27 +97,13 @@ static void drawMainButton(
     );
 }
 
-
-// ============================================================
-// AFFICHAGE ECRAN PRINCIPAL
-// ============================================================
-
 void mainScreenShow(TFT_eSPI &tft)
 {
-    // --------------------------------------------------------
-    // Cadre commun
-    // --------------------------------------------------------
-
     displayDrawFrame(
         tft,
         "MAIN",
         100
     );
-
-
-    // --------------------------------------------------------
-    // Boutons
-    // --------------------------------------------------------
 
     for (uint8_t i = 0; i < MAIN_BUTTON_COUNT; i++)
     {
@@ -169,25 +114,9 @@ void mainScreenShow(TFT_eSPI &tft)
     }
 }
 
-
-// ============================================================
-// BOUCLE MAIN
-// ============================================================
-
 void mainScreenLoop(TFT_eSPI &tft)
 {
-    // Rien pour le moment.
 }
-
-
-// ============================================================
-// DETECTION TACTILE
-// ============================================================
-//
-// Les coordonnées utilisées ici sont exactement les mêmes
-// que celles utilisées pour dessiner les boutons.
-//
-// ============================================================
 
 bool mainScreenTouch(
     int16_t x,
@@ -199,24 +128,21 @@ bool mainScreenTouch(
     {
         const MainButton &button = mainButtons[i];
 
-
-        // ----------------------------------------------------
-        // Test zone bouton
-        // ----------------------------------------------------
-
         if (
             x >= button.x &&
-            x <  (button.x + button.width) &&
+            x < (button.x + button.width) &&
             y >= button.y &&
-            y <  (button.y + button.height)
+            y < (button.y + button.height)
         )
         {
             screen = button.screen;
 
+            Serial.print("[MAIN] Bouton touche -> ecran ");
+            Serial.println(screen);
+
             return true;
         }
     }
-
 
     return false;
 }
