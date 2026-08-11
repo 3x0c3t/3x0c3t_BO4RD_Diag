@@ -3,41 +3,101 @@
 
 #include "display_config.h"
 #include "personalization.h"
+#include "display.h"
 #include "main_screen.h"
+
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+
+void mainScreenInit(TFT_eSPI &tft)
+{
+    // Rien pour le moment.
+    //
+    // L'initialisation commune de l'affichage
+    // est geree par displayInit().
+}
+
+
+// ============================================================
+// AFFICHAGE ECRAN PRINCIPAL
+// ============================================================
 
 void mainScreenShow(TFT_eSPI &tft)
 {
-    tft.fillScreen(TFT_BLACK);
+    // ========================================================
+    // CADRE COMMUN
+    // ========================================================
+    //
+    // Toutes les pages utilisent exactement le meme cadre.
+    //
 
-    // BARRE SYSTEME | Zone standardisee utilisee par tous les ecrans
-
-    tft.fillRect(
-        SYSTEM_BAR_X,
-        SYSTEM_BAR_Y,
-        SYSTEM_BAR_WIDTH,
-        SYSTEM_BAR_HEIGHT,
-        SYSTEM_BAR_COLOR
+    displayDrawFrame(
+        tft,
+        "MAIN",
+        100
     );
 
+
+    // ========================================================
+    // CONTENU DE LA PAGE
+    // ========================================================
+    //
+    // Tout ce qui suit appartient exclusivement
+    // a la page MAIN.
+    //
+    // La page commence a UI_CONTENT_Y.
+    //
+
+    const int centerX =
+        UI_CONTENT_X +
+        (UI_CONTENT_WIDTH / 2);
+
+
+    const int centerY =
+        UI_CONTENT_Y +
+        (UI_CONTENT_HEIGHT / 2);
+
+
     // --------------------------------------------------------
-    // ECRAN PRINCIPAL
+    // Nom du projet
     // --------------------------------------------------------
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(
+        TFT_WHITE,
+        UI_BACKGROUND_COLOR
+    );
+
     tft.setTextDatum(MC_DATUM);
     tft.setTextSize(2);
 
     tft.drawString(
         "3x0c3t BO4RD",
-        TFT_WIDTH / 2,
-        80
+        centerX,
+        centerY - 20
     );
+
+
+    // --------------------------------------------------------
+    // Mode
+    // --------------------------------------------------------
 
     tft.setTextSize(1);
 
     tft.drawString(
         "DIAGNOSTIC",
-        TFT_WIDTH / 2,
-        110
+        centerX,
+        centerY + 10
     );
+}
+
+
+// ============================================================
+// LOOP ECRAN PRINCIPAL
+// ============================================================
+
+void mainScreenLoop(TFT_eSPI &tft)
+{
+    // Rien pour le moment.
 }
