@@ -2,12 +2,22 @@
 #include <TFT_eSPI.h>
 
 #include "display_config.h"
-#include "personalization.h"
 #include "display.h"
 #include "main_screen.h"
 
+
 // ============================================================
 // BOUTONS MAIN
+// ============================================================
+//
+// Une seule colonne.
+//
+// 1 : SYSTEME
+// 2 : WI-FI
+// 3 : CARTE SD
+// 4 : TACTILE
+// 5 : DIAGNOSTICS
+//
 // ============================================================
 
 static MainButton mainButtons[MAIN_BUTTON_COUNT] =
@@ -17,47 +27,47 @@ static MainButton mainButtons[MAIN_BUTTON_COUNT] =
         MAIN_BUTTON_START_Y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        "ECRAN 1",
+        "SYSTEME",
         1
     },
 
     {
         MAIN_BUTTON_X,
         MAIN_BUTTON_START_Y +
-            (MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 1,
+            ((MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 1),
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        "ECRAN 2",
+        "WI-FI",
         2
     },
 
     {
         MAIN_BUTTON_X,
         MAIN_BUTTON_START_Y +
-            (MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 2,
+            ((MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 2),
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        "ECRAN 3",
+        "CARTE SD",
         3
     },
 
     {
         MAIN_BUTTON_X,
         MAIN_BUTTON_START_Y +
-            (MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 3,
+            ((MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 3),
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        "ECRAN 4",
+        "TACTILE",
         4
     },
 
     {
         MAIN_BUTTON_X,
         MAIN_BUTTON_START_Y +
-            (MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 4,
+            ((MAIN_BUTTON_HEIGHT + MAIN_BUTTON_GAP) * 4),
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        "ECRAN 5",
+        "DIAGNOSTICS",
         5
     }
 };
@@ -82,7 +92,10 @@ static void drawMainButton(
     const MainButton &button
 )
 {
-    // Fond
+    // --------------------------------------------------------
+    // Fond du bouton
+    // --------------------------------------------------------
+
     tft.fillRect(
         button.x,
         button.y,
@@ -91,7 +104,11 @@ static void drawMainButton(
         TFT_BLACK
     );
 
+
+    // --------------------------------------------------------
     // Contour
+    // --------------------------------------------------------
+
     tft.drawRect(
         button.x,
         button.y,
@@ -100,13 +117,18 @@ static void drawMainButton(
         TFT_CYAN
     );
 
+
+    // --------------------------------------------------------
     // Texte
+    // --------------------------------------------------------
+
     tft.setTextColor(
         TFT_WHITE,
         TFT_BLACK
     );
 
     tft.setTextDatum(MC_DATUM);
+
     tft.setTextSize(2);
 
     tft.drawString(
@@ -118,22 +140,26 @@ static void drawMainButton(
 
 
 // ============================================================
-// AFFICHAGE MAIN
+// AFFICHAGE ECRAN PRINCIPAL
 // ============================================================
 
 void mainScreenShow(TFT_eSPI &tft)
 {
-    // Fond
-    tft.fillScreen(UI_BACKGROUND_COLOR);
-
+    // --------------------------------------------------------
     // Cadre commun
+    // --------------------------------------------------------
+
     displayDrawFrame(
         tft,
         "MAIN",
         100
     );
 
+
+    // --------------------------------------------------------
     // Boutons
+    // --------------------------------------------------------
+
     for (uint8_t i = 0; i < MAIN_BUTTON_COUNT; i++)
     {
         drawMainButton(
@@ -145,7 +171,7 @@ void mainScreenShow(TFT_eSPI &tft)
 
 
 // ============================================================
-// LOOP MAIN
+// BOUCLE MAIN
 // ============================================================
 
 void mainScreenLoop(TFT_eSPI &tft)
@@ -156,6 +182,11 @@ void mainScreenLoop(TFT_eSPI &tft)
 
 // ============================================================
 // DETECTION TACTILE
+// ============================================================
+//
+// Les coordonnées utilisées ici sont exactement les mêmes
+// que celles utilisées pour dessiner les boutons.
+//
 // ============================================================
 
 bool mainScreenTouch(
@@ -168,17 +199,24 @@ bool mainScreenTouch(
     {
         const MainButton &button = mainButtons[i];
 
+
+        // ----------------------------------------------------
+        // Test zone bouton
+        // ----------------------------------------------------
+
         if (
             x >= button.x &&
-            x <  button.x + button.width &&
+            x <  (button.x + button.width) &&
             y >= button.y &&
-            y <  button.y + button.height
+            y <  (button.y + button.height)
         )
         {
             screen = button.screen;
+
             return true;
         }
     }
+
 
     return false;
 }
