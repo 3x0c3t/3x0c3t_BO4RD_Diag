@@ -1,32 +1,36 @@
-#ifndef DISPLAY_CONFIG_H
-#define DISPLAY_CONFIG_H
+// HEADER
+#define UI_HEADER_Y             0
+#define UI_HEADER_HEIGHT        45
 
-#define TFT_WIDTH  240
-#define TFT_HEIGHT 320
+// HEURE / DATE
+#define UI_DATETIME_X           5
+#define UI_DATETIME_Y           8
 
-#define TFT_ROTATION 2
+// CARRÉS FONCTIONS
+#define UI_BUTTON_SIZE          30
+#define UI_BUTTON_Y             7
+#define UI_BUTTON_GAP           5
+#define UI_BUTTON_COUNT         4
 
-// BARRE SYSTEME | Zone standardisee utilisee par tous les ecrans
-#define SYSTEM_BAR_X       0
-#define SYSTEM_BAR_Y       10
-#define SYSTEM_BAR_WIDTH   TFT_WIDTH
-#define SYSTEM_BAR_HEIGHT  2
-#define SYSTEM_BAR_COLOR   TFT_CYAN
+// LIGNE HEADER
+#define UI_HEADER_LINE_Y        45
 
-// SPLASH | Couleurs
-#define SPLASH_BACKGROUND  TFT_BLACK
-#define SPLASH_TEXT_COLOR  TFT_WHITE
-#define SPLASH_ACCENT      TFT_CYAN
+// BARRE SYSTEME
+#define UI_BAR_X                0
+#define UI_BAR_Y                55
+#define UI_BAR_WIDTH            TFT_WIDTH
+#define UI_BAR_HEIGHT           2
+#define UI_BAR_COLOR            TFT_CYAN
 
-// SPLASH | Positions
-#define SPLASH_BRAND_Y     100
-#define SPLASH_MOTTO_Y     130
-#define SPLASH_SEPARATOR_Y 165
-#define SPLASH_PROJECT_Y   195
-#define SPLASH_VERSION_Y   225
-#define SPLASH_DATE_Y      250
+// DEUXIÈME LIGNE
+#define UI_TITLE_LINE_Y         80
 
-// SPLASH | Duree
-#define SPLASH_DURATION_MS 3000
+// TITRE PAGE
+#define UI_TITLE_X              10
+#define UI_TITLE_Y              65
 
-#endif
+// ZONE CONTENU
+#define UI_CONTENT_X            0
+#define UI_CONTENT_Y            81
+#define UI_CONTENT_WIDTH        TFT_WIDTH
+#define UI_CONTENT_HEIGHT       (TFT_HEIGHT - UI_CONTENT_Y)

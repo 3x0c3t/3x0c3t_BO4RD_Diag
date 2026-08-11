@@ -8,8 +8,9 @@
 
 #include "display.h"
 #include "splash.h"
+#include "main_screen.h"
 
-// MODULES DESACTIVES
+// MODULES DESACTIVEES
 // #include "touch.h"
 // #include "sd_diag.h"
 // #include "wifi_diag.h"
@@ -28,10 +29,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 void setup()
 {
-    // --------------------------------------------------------
     // SERIAL
-    // --------------------------------------------------------
-
     Serial.begin(115200);
     delay(500);
 
@@ -42,47 +40,38 @@ void setup()
     Serial.println("========================================");
     Serial.println();
 
-    // --------------------------------------------------------
     // SPI
-    // --------------------------------------------------------
-
     SPI.begin();
-
     Serial.println("[BOOT] SPI initialise");
 
-    // --------------------------------------------------------
     // DISPLAY
-    // --------------------------------------------------------
-
     Serial.println("[BOOT] Initialisation display...");
-
     displayInit(tft);
-
     Serial.println("[BOOT] Display initialise");
 
-    // --------------------------------------------------------
     // SPLASH
-    // --------------------------------------------------------
-
     Serial.println("[BOOT] Affichage splash...");
-
     splashInit(tft);
     splashShow(tft);
     splashWait();
-
     Serial.println("[BOOT] Splash termine");
 
-    // --------------------------------------------------------
-    // BARRE SYSTEME
-    // --------------------------------------------------------
+    // ========================================================
+    // TRANSITION SPLASH -> MAIN
+    // ========================================================
+
+    Serial.println("[BOOT] Passage ecran principal...");
+
+    tft.fillScreen(TFT_BLACK);
 
     displayDrawSystemBar(tft);
+    mainScreenShow(tft);
 
-    Serial.println("[BOOT] Barre systeme affichee");
+    Serial.println("[BOOT] Ecran principal affiche");
 
-    // --------------------------------------------------------
-    // MODULES DESACTIVES
-    // --------------------------------------------------------
+    // ========================================================
+    // MODULES DESACTIVEES
+    // ========================================================
 
     Serial.println();
     Serial.println("[BOOT] Modules supplementaires desactives");
@@ -92,14 +81,12 @@ void setup()
     Serial.println("[BOOT] SYSTEM: OFF");
     Serial.println("[BOOT] DIAG  : OFF");
 
-    // --------------------------------------------------------
+    // ========================================================
     // FIN BOOT
-    // --------------------------------------------------------
+    // ========================================================
 
     Serial.println();
-    Serial.println("========================================");
-    Serial.println("             BOOT TERMINE");
-    Serial.println("========================================");
+    Serial.println("=== BOOT TERMINE ===");
     Serial.println();
 }
 
