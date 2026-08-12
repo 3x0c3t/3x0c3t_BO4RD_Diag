@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 
 #include "touch.h"
@@ -8,14 +9,7 @@
 // XPT2046
 // ============================================================
 
-static XPT2046_Touchscreen touch(
-    BO4RD_TOUCH_CS,
-    BO4RD_TOUCH_IRQ
-);
-
-// ============================================================
-// ETAT
-// ============================================================
+static XPT2046_Touchscreen touch(BO4RD_TOUCH_CS);
 
 static bool touchInitialized = false;
 
@@ -30,26 +24,6 @@ void touchInit(TFT_eSPI &tft)
     Serial.println("[TOUCH] Initialisation XPT2046");
 
     // --------------------------------------------------------
-    // TFT CS
-    // --------------------------------------------------------
-
-    pinMode(BO4RD_TFT_CS, OUTPUT);
-    digitalWrite(BO4RD_TFT_CS, HIGH);
-
-    // --------------------------------------------------------
-    // TOUCH CS
-    // --------------------------------------------------------
-
-    pinMode(BO4RD_TOUCH_CS, OUTPUT);
-    digitalWrite(BO4RD_TOUCH_CS, HIGH);
-
-    // --------------------------------------------------------
-    // TOUCH IRQ
-    // --------------------------------------------------------
-
-    pinMode(BO4RD_TOUCH_IRQ, INPUT_PULLUP);
-
-    // --------------------------------------------------------
     // SPI ESP8266
     // --------------------------------------------------------
 
@@ -58,41 +32,70 @@ void touchInit(TFT_eSPI &tft)
     Serial.println("[TOUCH] SPI.begin() OK");
 
     // --------------------------------------------------------
-    // XPT2046
+    // CS tactile
     // --------------------------------------------------------
 
-    touch.begin();
+    pinMode(BO4RD_TOUCH_CS, OUTPUT);
 
-    touch.setRotation(2);
+    digitalWrite(BO4RD_TOUCH_CS, HIGH);
 
-    touchInitialized = true;
+    // --------------------------------------------------------
+    // IRQ
+    // --------------------------------------------------------
 
-    Serial.println("[TOUCH] XPT2046 initialise");
+    pinMode(BO4RD_TOUCH_IRQ, INPUT_PULLUP);
 
-    Serial.print("[TOUCH] CS  = GPIO");
+    // --------------------------------------------------------
+    // Initialisation XPT2046
+    // --------------------------------------------------------
+
+    delay(20);
+
+    if (touch.begin())
+    {
+        Serial.println("[TOUCH] XPT2046 initialise");
+        touchInitialized = true;
+    }
+    else
+    {
+        Serial.println("[TOUCH] ERREUR XPT2046");
+        touchInitialized = false;
+        return;
+    }
+
+    // --------------------------------------------------------
+    // Rotation
+    // --------------------------------------------------------
+
+    touch.setRotation(1);
+
+    // --------------------------------------------------------
+    // Informations
+    // --------------------------------------------------------
+
+    Serial.print("[TOUCH] CS   = ");
     Serial.println(BO4RD_TOUCH_CS);
 
-    Serial.print("[TOUCH] IRQ = GPIO");
-    Serial.println(BO4RD_TOUCH_IRQ);
+    Serial.print("[TOUCH] SCK  = ");
+    Serial.println(BO4RD_TOUCH_SCK);
 
-    Serial.print("[TOUCH] IRQ actuel = ");
-    Serial.println(digitalRead(BO4RD_TOUCH_IRQ));
+    Serial.print("[TOUCH] MOSI = ");
+    Serial.println(BO4RD_TOUCH_MOSI);
+
+    Serial.print("[TOUCH] MISO = ");
+    Serial.println(BO4RD_TOUCH_MISO);
+
+    Serial.print("[TOUCH] IRQ  = ");
+    Serial.println(BO4RD_TOUCH_IRQ);
 }
 
 // ============================================================
-// DISPONIBILITE
+// ETAT
 // ============================================================
 
-bool touchAvailable()
+bool touchIsInitialized()
 {
-    if (!touchInitialized)
-    {
-        return false;
-    }
-
-    digitalWrite(BO4RD_TFT_CS, HIGH);
-
-    return touch.touched();
+    return touchInitialized;
 }
 
 // ============================================================
@@ -103,7 +106,7 @@ bool touchRead(
     TFT_eSPI &tft,
     int16_t &x,
     int16_t &y,
-    uint16_t &pressure
+    uint16_t &z
 )
 {
     (void)tft;
@@ -114,13 +117,7 @@ bool touchRead(
     }
 
     // --------------------------------------------------------
-    // TFT OFF
-    // --------------------------------------------------------
-
-    digitalWrite(BO4RD_TFT_CS, HIGH);
-
-    // --------------------------------------------------------
-    // TEST TOUCH
+    // Pas de contact
     // --------------------------------------------------------
 
     if (!touch.touched())
@@ -129,49 +126,90 @@ bool touchRead(
     }
 
     // --------------------------------------------------------
-    // LECTURE XPT2046
+    // Lecture XPT2046
     // --------------------------------------------------------
 
-    TS_Point point = touch.getPoint();
+    TS_Point p = touch.getPoint();
+
+    uint16_t rawX = p.x;
+    uint16_t rawY = p.y;
+    uint16_t rawZ = p.z;
 
     // --------------------------------------------------------
-    // VALEURS BRUTES
-    // --------------------------------------------------------
-
-    x = point.x;
-    y = point.y;
-    pressure = point.z;
-
-    // --------------------------------------------------------
-    // LOG BRUT
+    // LOG RAW
     // --------------------------------------------------------
 
     Serial.print("[TOUCH] RAW X=");
+    Serial.print(rawX);
+
+    Serial.print(" Y=");
+    Serial.print(rawY);
+
+    Serial.print(" Z=");
+    Serial.println(rawZ);
+
+    // --------------------------------------------------------
+    // Vérification lecture
+    // --------------------------------------------------------
+
+    if (
+        rawX == 0 ||
+        rawY == 0 ||
+        rawX >= 4095 ||
+        rawY >= 4095
+    )
+    {
+        Serial.println("[TOUCH] Lecture RAW invalide");
+        return false;
+    }
+
+    // --------------------------------------------------------
+    // CALIBRATION PROVISOIRE
+    //
+    // Ces valeurs servent uniquement à obtenir
+    // des coordonnées écran 240x320.
+    //
+    // Elles seront remplacées par les vraies valeurs
+    // de calibration après le test RAW.
+    // --------------------------------------------------------
+
+    x = map(
+        rawX,
+        200,
+        3900,
+        0,
+        239
+    );
+
+    y = map(
+        rawY,
+        200,
+        3900,
+        0,
+        319
+    );
+
+    // --------------------------------------------------------
+    // Limites écran
+    // --------------------------------------------------------
+
+    x = constrain(x, 0, 239);
+    y = constrain(y, 0, 319);
+
+    z = rawZ;
+
+    // --------------------------------------------------------
+    // LOG COORDONNEES ECRAN
+    // --------------------------------------------------------
+
+    Serial.print("[TOUCH] SCREEN X=");
     Serial.print(x);
 
     Serial.print(" Y=");
     Serial.print(y);
 
     Serial.print(" Z=");
-    Serial.println(pressure);
-
-    // --------------------------------------------------------
-    // REJET DES VALEURS MANIFESTEMENT INVALIDES
-    // --------------------------------------------------------
-
-    if (
-        x == 0 &&
-        y == 0 &&
-        pressure >= 4095
-    )
-    {
-        Serial.println("[TOUCH] Valeur invalide ignoree");
-        return false;
-    }
-
-    // --------------------------------------------------------
-    // CONTACT VALIDE
-    // --------------------------------------------------------
+    Serial.println(z);
 
     return true;
 }

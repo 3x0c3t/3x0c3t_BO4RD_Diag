@@ -9,21 +9,10 @@
 // ============================================================
 
 #define BO4RD_TOUCH_CS    0
-#define BO4RD_TOUCH_IRQ   5
-
-// ============================================================
-// SPI
-// ============================================================
-
 #define BO4RD_TOUCH_SCK   14
 #define BO4RD_TOUCH_MOSI  13
 #define BO4RD_TOUCH_MISO  12
-
-// ============================================================
-// TFT
-// ============================================================
-
-#define BO4RD_TFT_CS      15
+#define BO4RD_TOUCH_IRQ   5
 
 // ============================================================
 // API
@@ -31,13 +20,13 @@
 
 void touchInit(TFT_eSPI &tft);
 
-bool touchAvailable();
+bool touchIsInitialized();
 
 bool touchRead(
     TFT_eSPI &tft,
     int16_t &x,
     int16_t &y,
-    uint16_t &pressure
+    uint16_t &z
 );
 
 #endif
