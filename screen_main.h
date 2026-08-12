@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 
-
 // ============================================================
 // BOUTON MAIN
 // ============================================================
@@ -13,14 +12,14 @@ struct MainButton
 {
     int16_t x;
     int16_t y;
+
     int16_t width;
     int16_t height;
 
-    const char *label;
+    const char* label;
 
     uint8_t screen;
 };
-
 
 // ============================================================
 // CONFIGURATION
@@ -29,13 +28,12 @@ struct MainButton
 #define MAIN_BUTTON_COUNT    5
 
 #define MAIN_BUTTON_X        10
-#define MAIN_BUTTON_START_Y  90
+#define MAIN_BUTTON_START_Y  85
 
 #define MAIN_BUTTON_WIDTH    220
-#define MAIN_BUTTON_HEIGHT   38
+#define MAIN_BUTTON_HEIGHT   40
 
-#define MAIN_BUTTON_GAP      3
-
+#define MAIN_BUTTON_GAP      5
 
 // ============================================================
 // API

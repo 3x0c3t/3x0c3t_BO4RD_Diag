@@ -8,7 +8,9 @@
 // INITIALISATION
 // ============================================================
 
-void touchInit(TFT_eSPI &tft);
+void touchInit(
+    TFT_eSPI &tft
+);
 
 // ============================================================
 // DISPONIBILITE

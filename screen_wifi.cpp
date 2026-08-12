@@ -10,37 +10,62 @@
 // CONFIGURATION
 // ============================================================
 
-static const int16_t WIFI_TITLE_Y = 40;
+#define WIFI_BACK_X       10
+#define WIFI_BACK_Y       180
+#define WIFI_BACK_WIDTH   100
+#define WIFI_BACK_HEIGHT  40
 
 // ============================================================
 // INITIALISATION
 // ============================================================
 
-void wifiScreenInit(TFT_eSPI &tft)
+void wifiScreenInit(
+    TFT_eSPI &tft
+)
 {
     (void)tft;
 
-    LOG_WIFI("[WIFI] Ecran Wi-Fi initialise");
+    LOG_WIFI(
+        "[WIFI] Ecran Wi-Fi initialise"
+    );
 }
 
 // ============================================================
 // AFFICHAGE
 // ============================================================
 
-void wifiScreenShow(TFT_eSPI &tft)
+void wifiScreenShow(
+    TFT_eSPI &tft
+)
 {
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(
+        TFT_BLACK
+    );
 
-    displayDrawSystemBar(tft);
+    displayDrawSystemBar(
+        tft
+    );
 
     // --------------------------------------------------------
     // TITRE
     // --------------------------------------------------------
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(
+        TFT_WHITE,
+        TFT_BLACK
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
+    );
+
     tft.setTextSize(2);
-    tft.setCursor(10, WIFI_TITLE_Y);
-    tft.print("WI-FI");
+
+    tft.drawString(
+        "WI-FI",
+        10,
+        40
+    );
 
     // --------------------------------------------------------
     // INFORMATIONS
@@ -48,46 +73,70 @@ void wifiScreenShow(TFT_eSPI &tft)
 
     tft.setTextSize(1);
 
-    tft.setCursor(10, 75);
-    tft.print("Etat Wi-Fi : ");
+    tft.drawString(
+        "Etat Wi-Fi : OFF",
+        10,
+        75
+    );
 
-    tft.setCursor(10, 95);
-    tft.print("SSID : ");
+    tft.drawString(
+        "SSID :",
+        10,
+        95
+    );
 
-    tft.setCursor(10, 115);
-    tft.print("IP : ");
+    tft.drawString(
+        "IP :",
+        10,
+        115
+    );
 
     // --------------------------------------------------------
-    // BOUTON RETOUR
+    // RETOUR
     // --------------------------------------------------------
 
     tft.drawRect(
-        10,
-        180,
-        100,
-        40,
+        WIFI_BACK_X,
+        WIFI_BACK_Y,
+        WIFI_BACK_WIDTH,
+        WIFI_BACK_HEIGHT,
         TFT_WHITE
     );
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextSize(1);
-    tft.setCursor(30, 195);
-    tft.print("RETOUR");
+    tft.setTextDatum(
+        MC_DATUM
+    );
 
-    LOGLN_WIFI("[WIFI] Page affichee");
+    tft.drawString(
+        "RETOUR",
+        WIFI_BACK_X +
+            (WIFI_BACK_WIDTH / 2),
+        WIFI_BACK_Y +
+            (WIFI_BACK_HEIGHT / 2)
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
+    );
+
+    LOGLN_WIFI(
+        "[WIFI] Page affichee"
+    );
 }
 
 // ============================================================
-// BOUCLE
+// LOOP
 // ============================================================
 
-void wifiScreenLoop(TFT_eSPI &tft)
+void wifiScreenLoop(
+    TFT_eSPI &tft
+)
 {
     (void)tft;
 }
 
 // ============================================================
-// GESTION DU TOUCH
+// TOUCH
 // ============================================================
 
 bool wifiScreenTouch(
@@ -96,27 +145,27 @@ bool wifiScreenTouch(
     uint8_t &screen
 )
 {
-    // --------------------------------------------------------
-    // BOUTON RETOUR
-    // --------------------------------------------------------
-
     if (
-        x >= 10 &&
-        x < 110 &&
-        y >= 180 &&
-        y < 220
+        x >= WIFI_BACK_X &&
+        x < (
+            WIFI_BACK_X +
+            WIFI_BACK_WIDTH
+        ) &&
+        y >= WIFI_BACK_Y &&
+        y < (
+            WIFI_BACK_Y +
+            WIFI_BACK_HEIGHT
+        )
     )
     {
         screen = 0;
 
-        LOG_WIFI("[WIFI] Touch RETOUR -> MAIN");
+        LOG_WIFI(
+            "[WIFI] RETOUR -> MAIN"
+        );
 
         return true;
     }
-
-    // --------------------------------------------------------
-    // AUCUN BOUTON
-    // --------------------------------------------------------
 
     return false;
 }

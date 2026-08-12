@@ -5,6 +5,10 @@
 #include "config.h"
 #include "touch.h"
 
+// ============================================================
+// BROCHES 3x0c3t BO4RD
+// ============================================================
+
 #ifndef BO4RD_TFT_CS
 #define BO4RD_TFT_CS 15
 #endif
@@ -17,42 +21,87 @@
 #define BO4RD_TOUCH_IRQ 5
 #endif
 
-#define XPT2046_CMD_X  0xD0
-#define XPT2046_CMD_Y  0x90
-#define XPT2046_CMD_Z1 0xB0
-#define XPT2046_CMD_Z2 0xC0
+// ============================================================
+// COMMANDES XPT2046
+// ============================================================
+
+#define XPT2046_CMD_X   0xD0
+#define XPT2046_CMD_Y   0x90
+#define XPT2046_CMD_Z1  0xB0
+#define XPT2046_CMD_Z2  0xC0
+
+// ============================================================
+// ETAT
+// ============================================================
 
 static bool touchInitialized = false;
 
-static uint16_t xptRead(uint8_t command)
+// ============================================================
+// LECTURE SPI BRUTE XPT2046
+// ============================================================
+
+static uint16_t xpt2046Read(uint8_t command)
 {
-    uint8_t b1;
-    uint8_t b2;
+    uint16_t value;
+
+    // --------------------------------------------------------
+    // Désélectionner complètement le TFT
+    // --------------------------------------------------------
 
     digitalWrite(BO4RD_TFT_CS, HIGH);
+
+    // --------------------------------------------------------
+    // Sélectionner XPT2046
+    // --------------------------------------------------------
+
     digitalWrite(BO4RD_TOUCH_CS, LOW);
 
-    delayMicroseconds(5);
+    delayMicroseconds(2);
+
+    // --------------------------------------------------------
+    // Transaction SPI
+    // XPT2046 : MSB first, mode 0
+    // --------------------------------------------------------
+
+    SPI.beginTransaction(
+        SPISettings(
+            2500000,
+            MSBFIRST,
+            SPI_MODE0
+        )
+    );
 
     SPI.transfer(command);
 
-    delayMicroseconds(5);
+    uint8_t highByte = SPI.transfer(0x00);
+    uint8_t lowByte  = SPI.transfer(0x00);
 
-    b1 = SPI.transfer(0x00);
-    b2 = SPI.transfer(0x00);
+    SPI.endTransaction();
 
-    delayMicroseconds(5);
+    // --------------------------------------------------------
+    // Désélection XPT2046
+    // --------------------------------------------------------
 
     digitalWrite(BO4RD_TOUCH_CS, HIGH);
 
-    uint16_t value =
-        ((uint16_t)b1 << 8) |
-        b2;
+    // --------------------------------------------------------
+    // Conversion 12 bits
+    // --------------------------------------------------------
+
+    value =
+        ((uint16_t)highByte << 8) |
+        lowByte;
 
     value >>= 3;
 
-    return value & 0x0FFF;
+    value &= 0x0FFF;
+
+    return value;
 }
+
+// ============================================================
+// INITIALISATION
+// ============================================================
 
 void touchInit(TFT_eSPI &tft)
 {
@@ -60,21 +109,58 @@ void touchInit(TFT_eSPI &tft)
 
     Serial.println("[TOUCH] Initialisation XPT2046");
 
-    pinMode(BO4RD_TFT_CS, OUTPUT);
-    digitalWrite(BO4RD_TFT_CS, HIGH);
+    // --------------------------------------------------------
+    // CS TFT
+    // --------------------------------------------------------
 
-    pinMode(BO4RD_TOUCH_CS, OUTPUT);
-    digitalWrite(BO4RD_TOUCH_CS, HIGH);
+    pinMode(
+        BO4RD_TFT_CS,
+        OUTPUT
+    );
 
-    pinMode(BO4RD_TOUCH_IRQ, INPUT);
+    digitalWrite(
+        BO4RD_TFT_CS,
+        HIGH
+    );
+
+    // --------------------------------------------------------
+    // CS TOUCH
+    // --------------------------------------------------------
+
+    pinMode(
+        BO4RD_TOUCH_CS,
+        OUTPUT
+    );
+
+    digitalWrite(
+        BO4RD_TOUCH_CS,
+        HIGH
+    );
+
+    // --------------------------------------------------------
+    // IRQ TOUCH
+    // --------------------------------------------------------
+
+    pinMode(
+        BO4RD_TOUCH_IRQ,
+        INPUT_PULLUP
+    );
+
+    // --------------------------------------------------------
+    // SPI
+    // --------------------------------------------------------
 
     SPI.begin();
 
-    delay(10);
+    delay(20);
 
     touchInitialized = true;
 
-    Serial.println("[TOUCH] SPI.begin() OK");
+    // --------------------------------------------------------
+    // Diagnostic
+    // --------------------------------------------------------
+
+    Serial.println("[TOUCH] SPI initialise");
 
     Serial.print("[TOUCH] TFT CS = ");
     Serial.println(BO4RD_TFT_CS);
@@ -86,10 +172,16 @@ void touchInit(TFT_eSPI &tft)
     Serial.println(BO4RD_TOUCH_IRQ);
 
     Serial.print("[TOUCH] IRQ actuel = ");
-    Serial.println(digitalRead(BO4RD_TOUCH_IRQ));
+    Serial.println(
+        digitalRead(BO4RD_TOUCH_IRQ)
+    );
 
-    Serial.println("[TOUCH] Test SPI XPT2046...");
+    Serial.println("[TOUCH] XPT2046 pret");
 }
+
+// ============================================================
+// DISPONIBILITE
+// ============================================================
 
 bool touchAvailable()
 {
@@ -98,8 +190,14 @@ bool touchAvailable()
         return false;
     }
 
-    return digitalRead(BO4RD_TOUCH_IRQ) == LOW;
+    return (
+        digitalRead(BO4RD_TOUCH_IRQ) == LOW
+    );
 }
+
+// ============================================================
+// LECTURE TOUCH
+// ============================================================
 
 bool touchRead(
     TFT_eSPI &tft,
@@ -115,44 +213,70 @@ bool touchRead(
         return false;
     }
 
-    if (digitalRead(BO4RD_TOUCH_IRQ) == HIGH)
+    // --------------------------------------------------------
+    // PAS DE CONTACT
+    // --------------------------------------------------------
+
+    if (
+        digitalRead(BO4RD_TOUCH_IRQ) != LOW
+    )
     {
         return false;
     }
 
+    // --------------------------------------------------------
+    // LECTURE RAW
+    // --------------------------------------------------------
+
     uint16_t rawX =
-        xptRead(XPT2046_CMD_X);
+        xpt2046Read(
+            XPT2046_CMD_X
+        );
 
     uint16_t rawY =
-        xptRead(XPT2046_CMD_Y);
+        xpt2046Read(
+            XPT2046_CMD_Y
+        );
 
     uint16_t rawZ1 =
-        xptRead(XPT2046_CMD_Z1);
+        xpt2046Read(
+            XPT2046_CMD_Z1
+        );
 
     uint16_t rawZ2 =
-        xptRead(XPT2046_CMD_Z2);
+        xpt2046Read(
+            XPT2046_CMD_Z2
+        );
 
-    Serial.print("[TOUCH] RAW X=");
-    Serial.print(rawX);
-
-    Serial.print(" Y=");
-    Serial.print(rawY);
-
-    Serial.print(" Z1=");
-    Serial.print(rawZ1);
-
-    Serial.print(" Z2=");
-    Serial.println(rawZ2);
+    // --------------------------------------------------------
+    // VALIDATION PRESSION
+    // --------------------------------------------------------
 
     if (
-        rawX == 0 &&
-        rawY == 0 &&
-        rawZ1 == 0 &&
-        rawZ2 == 0
+        rawZ1 == 0 ||
+        rawZ1 >= 4095
     )
     {
-        Serial.println("[TOUCH] Aucune donnee SPI");
+        return false;
+    }
 
+    if (
+        rawZ2 == 0 ||
+        rawZ2 >= 4095
+    )
+    {
+        return false;
+    }
+
+    // --------------------------------------------------------
+    // VALIDATION COORDONNEES
+    // --------------------------------------------------------
+
+    if (
+        rawX == 0 ||
+        rawY == 0
+    )
+    {
         return false;
     }
 
@@ -161,10 +285,12 @@ bool touchRead(
         rawY >= 4095
     )
     {
-        Serial.println("[TOUCH] Donnee RAW invalide");
-
         return false;
     }
+
+    // --------------------------------------------------------
+    // MAPPING
+    // --------------------------------------------------------
 
     x = map(
         rawX,
@@ -182,12 +308,25 @@ bool touchRead(
         319
     );
 
-    x = constrain(x, 0, 239);
-    y = constrain(y, 0, 319);
+    x = constrain(
+        x,
+        0,
+        239
+    );
+
+    y = constrain(
+        y,
+        0,
+        319
+    );
 
     z = rawZ1;
 
-    Serial.print("[TOUCH] SCREEN X=");
+    // --------------------------------------------------------
+    // EVENEMENT VALIDE
+    // --------------------------------------------------------
+
+    Serial.print("[TOUCH] X=");
     Serial.print(x);
 
     Serial.print(" Y=");

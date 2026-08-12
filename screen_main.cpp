@@ -6,12 +6,13 @@
 #include "screen_main.h"
 #include "debug.h"
 
-
 // ============================================================
 // BOUTONS MAIN
 // ============================================================
 
-static MainButton mainButtons[MAIN_BUTTON_COUNT] =
+static const MainButton mainButtons[
+    MAIN_BUTTON_COUNT
+] =
 {
     {
         MAIN_BUTTON_X,
@@ -63,7 +64,6 @@ static MainButton mainButtons[MAIN_BUTTON_COUNT] =
     }
 };
 
-
 // ============================================================
 // INITIALISATION
 // ============================================================
@@ -73,12 +73,7 @@ void mainScreenInit(
 )
 {
     (void)tft;
-
-    LOGLN_MAIN(
-        "[MAIN] Initialisation"
-    );
 }
-
 
 // ============================================================
 // DESSIN BOUTON
@@ -90,7 +85,7 @@ static void drawMainButton(
 )
 {
     // --------------------------------------------------------
-    // Fond
+    // FOND
     // --------------------------------------------------------
 
     tft.fillRect(
@@ -101,9 +96,8 @@ static void drawMainButton(
         TFT_BLACK
     );
 
-
     // --------------------------------------------------------
-    // Contour
+    // CONTOUR
     // --------------------------------------------------------
 
     tft.drawRect(
@@ -114,9 +108,8 @@ static void drawMainButton(
         TFT_CYAN
     );
 
-
     // --------------------------------------------------------
-    // Texte
+    // TEXTE
     // --------------------------------------------------------
 
     tft.setTextColor(
@@ -132,11 +125,16 @@ static void drawMainButton(
 
     tft.drawString(
         button.label,
-        button.x + (button.width / 2),
-        button.y + (button.height / 2)
+        button.x +
+            (button.width / 2),
+        button.y +
+            (button.height / 2)
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
     );
 }
-
 
 // ============================================================
 // AFFICHAGE MAIN
@@ -150,20 +148,18 @@ void mainScreenShow(
         "[MAIN] Affichage page MAIN"
     );
 
-
     // --------------------------------------------------------
-    // Cadre commun
+    // CADRE
     // --------------------------------------------------------
 
     displayDrawFrame(
         tft,
         "MAIN",
-        100
+        70
     );
 
-
     // --------------------------------------------------------
-    // Boutons
+    // BOUTONS
     // --------------------------------------------------------
 
     for (
@@ -176,28 +172,12 @@ void mainScreenShow(
             tft,
             mainButtons[i]
         );
-
-
-        // ----------------------------------------------------
-        // DETAIL UNIQUEMENT NIVEAU 2
-        // ----------------------------------------------------
-
-        LOG_MAIN_DETAIL("[MAIN] Bouton ");
-        LOG_MAIN_DETAIL(i);
-
-        LOG_MAIN_DETAIL(" : ");
-        LOG_MAIN_DETAIL(mainButtons[i].label);
-
-        LOG_MAIN_DETAIL(" -> ecran ");
-        LOGLN_MAIN_DETAIL(mainButtons[i].screen);
     }
-
 
     LOGLN_MAIN(
         "[MAIN] Page MAIN affichee"
     );
 }
-
 
 // ============================================================
 // LOOP MAIN
@@ -210,7 +190,6 @@ void mainScreenLoop(
     (void)tft;
 }
 
-
 // ============================================================
 // TOUCH MAIN
 // ============================================================
@@ -221,21 +200,6 @@ bool mainScreenTouch(
     uint8_t &screen
 )
 {
-    // --------------------------------------------------------
-    // LOG IMPORTANT
-    // --------------------------------------------------------
-
-    LOG_MAIN("[MAIN] Touch X=");
-    LOG_MAIN(x);
-
-    LOG_MAIN(" Y=");
-    LOGLN_MAIN(y);
-
-
-    // --------------------------------------------------------
-    // TEST BOUTONS
-    // --------------------------------------------------------
-
     for (
         uint8_t i = 0;
         i < MAIN_BUTTON_COUNT;
@@ -245,52 +209,33 @@ bool mainScreenTouch(
         const MainButton &button =
             mainButtons[i];
 
-
-        // ----------------------------------------------------
-        // LOG COMPLET
-        // ----------------------------------------------------
-
-        LOG_MAIN_DETAIL("[MAIN] Test bouton ");
-        LOG_MAIN_DETAIL(i);
-
-        LOG_MAIN_DETAIL(" : ");
-        LOGLN_MAIN_DETAIL(button.label);
-
-
-        // ----------------------------------------------------
-        // TEST COORDONNEES
-        // ----------------------------------------------------
-
         if (
             x >= button.x &&
-            x < (button.x + button.width) &&
+            x < (
+                button.x +
+                button.width
+            ) &&
             y >= button.y &&
-            y < (button.y + button.height)
+            y < (
+                button.y +
+                button.height
+            )
         )
         {
-            screen = button.screen;
+            screen =
+                button.screen;
 
+            LOG_MAIN(
+                "[MAIN] -> "
+            );
 
-            LOG_MAIN("[MAIN] Bouton : ");
-            LOG_MAIN(button.label);
-
-            LOG_MAIN(" -> ecran ");
-            LOGLN_MAIN(screen);
-
+            LOGLN_MAIN(
+                button.label
+            );
 
             return true;
         }
     }
-
-
-    // --------------------------------------------------------
-    // AUCUN BOUTON
-    // --------------------------------------------------------
-
-    LOGLN_MAIN(
-        "[MAIN] Aucun bouton correspondant"
-    );
-
 
     return false;
 }

@@ -6,66 +6,126 @@
 #include "debug.h"
 
 // ============================================================
-// CONFIGURATION ECRAN SYSTEME
+// CONFIGURATION
 // ============================================================
 
-static const int16_t SYSTEME_TITLE_Y = 40;
+#define SYSTEME_BACK_X       10
+#define SYSTEME_BACK_Y       180
+#define SYSTEME_BACK_WIDTH   100
+#define SYSTEME_BACK_HEIGHT  40
 
 // ============================================================
 // INITIALISATION
 // ============================================================
 
-void systemeScreenInit(TFT_eSPI &tft)
+void systemeScreenInit(
+    TFT_eSPI &tft
+)
 {
     (void)tft;
-
-    LOG_SYSTEME("[SYSTEME] Ecran initialise");
 }
 
 // ============================================================
 // AFFICHAGE
 // ============================================================
 
-void systemeScreenShow(TFT_eSPI &tft)
+void systemeScreenShow(
+    TFT_eSPI &tft
+)
 {
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(
+        TFT_BLACK
+    );
 
-    displayDrawSystemBar(tft);
+    displayDrawSystemBar(
+        tft
+    );
 
     // --------------------------------------------------------
     // TITRE
     // --------------------------------------------------------
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(
+        TFT_WHITE,
+        TFT_BLACK
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
+    );
+
     tft.setTextSize(2);
-    tft.setCursor(10, SYSTEME_TITLE_Y);
-    tft.print("SYSTEME");
+
+    tft.drawString(
+        "SYSTEME",
+        10,
+        40
+    );
 
     // --------------------------------------------------------
-    // CONTENU
+    // INFORMATIONS
     // --------------------------------------------------------
 
     tft.setTextSize(1);
-    tft.setCursor(10, 75);
-    tft.print("Informations systeme");
 
-    tft.setCursor(10, 95);
-    tft.print("ESP8266 NodeMCU");
+    tft.drawString(
+        "Informations systeme",
+        10,
+        75
+    );
 
-    LOGLN_SYSTEME("[SYSTEME] Page affichee");
+    tft.drawString(
+        "ESP8266 NodeMCU",
+        10,
+        95
+    );
+
+    // --------------------------------------------------------
+    // RETOUR
+    // --------------------------------------------------------
+
+    tft.drawRect(
+        SYSTEME_BACK_X,
+        SYSTEME_BACK_Y,
+        SYSTEME_BACK_WIDTH,
+        SYSTEME_BACK_HEIGHT,
+        TFT_WHITE
+    );
+
+    tft.setTextDatum(
+        MC_DATUM
+    );
+
+    tft.drawString(
+        "RETOUR",
+        SYSTEME_BACK_X +
+            (SYSTEME_BACK_WIDTH / 2),
+        SYSTEME_BACK_Y +
+            (SYSTEME_BACK_HEIGHT / 2)
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
+    );
+
+    LOGLN_SYSTEME(
+        "[SYSTEME] Page affichee"
+    );
 }
 
 // ============================================================
-// BOUCLE
+// LOOP
 // ============================================================
 
-void systemeScreenLoop(TFT_eSPI &tft)
+void systemeScreenLoop(
+    TFT_eSPI &tft
+)
 {
     (void)tft;
 }
 
 // ============================================================
-// GESTION DU TOUCH
+// TOUCH
 // ============================================================
 
 bool systemeScreenTouch(
@@ -74,13 +134,27 @@ bool systemeScreenTouch(
     uint8_t &screen
 )
 {
-    // --------------------------------------------------------
-    // Pour le moment, aucun bouton SYSTEME
-    // --------------------------------------------------------
+    if (
+        x >= SYSTEME_BACK_X &&
+        x < (
+            SYSTEME_BACK_X +
+            SYSTEME_BACK_WIDTH
+        ) &&
+        y >= SYSTEME_BACK_Y &&
+        y < (
+            SYSTEME_BACK_Y +
+            SYSTEME_BACK_HEIGHT
+        )
+    )
+    {
+        screen = 0;
 
-    (void)x;
-    (void)y;
-    (void)screen;
+        LOG_SYSTEME(
+            "[SYSTEME] RETOUR -> MAIN"
+        );
+
+        return true;
+    }
 
     return false;
 }

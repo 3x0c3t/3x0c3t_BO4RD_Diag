@@ -58,36 +58,78 @@ const char* screenName(uint8_t screen)
 }
 
 // ============================================================
-// LOG TOUCH UNIQUE
+// AFFICHAGE PAGE SIMPLE
 // ============================================================
 
-void logTouchEvent(
-    uint8_t screenBefore,
-    uint8_t screenAfter,
-    int16_t x,
-    int16_t y,
-    uint16_t z
+void showSimpleScreen(
+    const char* title,
+    const char* description
 )
 {
-    Serial.println();
-    Serial.println("========================================");
+    tft.fillScreen(TFT_BLACK);
 
-    Serial.print("# ECRAN : [");
-    Serial.print(screenName(screenBefore));
+    displayDrawSystemBar(tft);
 
-    Serial.print("] - [EVENT] [TOUCH] sur (");
-    Serial.print(screenName(screenAfter));
+    // --------------------------------------------------------
+    // TITRE
+    // --------------------------------------------------------
 
-    Serial.print(") X : ");
-    Serial.print(x);
+    tft.setTextColor(
+        TFT_WHITE,
+        TFT_BLACK
+    );
 
-    Serial.print(" Y : ");
-    Serial.print(y);
+    tft.setTextDatum(
+        TL_DATUM
+    );
 
-    Serial.print(" Z : ");
-    Serial.println(z);
+    tft.setTextSize(2);
 
-    Serial.println("========================================");
+    tft.drawString(
+        title,
+        10,
+        40
+    );
+
+    // --------------------------------------------------------
+    // DESCRIPTION
+    // --------------------------------------------------------
+
+    tft.setTextSize(1);
+
+    tft.drawString(
+        description,
+        10,
+        75
+    );
+
+    // --------------------------------------------------------
+    // BOUTON RETOUR
+    // --------------------------------------------------------
+
+    tft.drawRect(
+        10,
+        180,
+        100,
+        40,
+        TFT_WHITE
+    );
+
+    tft.setTextDatum(
+        MC_DATUM
+    );
+
+    tft.setTextSize(1);
+
+    tft.drawString(
+        "RETOUR",
+        60,
+        200
+    );
+
+    tft.setTextDatum(
+        TL_DATUM
+    );
 }
 
 // ============================================================
@@ -105,20 +147,87 @@ void showScreen(
     switch (screen)
     {
         case 0:
+
             mainScreenShow(tft);
+
             break;
 
         case 1:
+
             systemeScreenShow(tft);
+
             break;
 
         case 2:
+
             wifiScreenShow(tft);
+
+            break;
+
+        case 3:
+
+            showSimpleScreen(
+                "CARTE SD",
+                "Gestion de la carte SD"
+            );
+
+            break;
+
+        case 4:
+
+            showSimpleScreen(
+                "TACTILE",
+                "Diagnostic tactile"
+            );
+
+            break;
+
+        case 5:
+
+            showSimpleScreen(
+                "DIAGNOSTICS",
+                "Diagnostics 3x0c3t BO4RD"
+            );
+
             break;
 
         default:
+
+            currentScreen = 0;
+
+            mainScreenShow(tft);
+
             break;
     }
+}
+
+// ============================================================
+// TOUCH ECRANS SIMPLES
+// ============================================================
+
+bool simpleScreenTouch(
+    int16_t x,
+    int16_t y,
+    uint8_t &screen
+)
+{
+    // --------------------------------------------------------
+    // BOUTON RETOUR
+    // --------------------------------------------------------
+
+    if (
+        x >= 10 &&
+        x < 110 &&
+        y >= 180 &&
+        y < 220
+    )
+    {
+        screen = 0;
+
+        return true;
+    }
+
+    return false;
 }
 
 // ============================================================
@@ -144,45 +253,61 @@ void setup()
 
     SPI.begin();
 
-    Serial.println("[BOOT] SPI initialise");
+    Serial.println(
+        "[BOOT] SPI initialise"
+    );
 
     // --------------------------------------------------------
     // DISPLAY
     // --------------------------------------------------------
 
-    Serial.println("[BOOT] Initialisation display...");
+    Serial.println(
+        "[BOOT] Initialisation display..."
+    );
 
     displayInit(tft);
 
-    Serial.println("[BOOT] Display initialise");
+    Serial.println(
+        "[BOOT] Display initialise"
+    );
 
     // --------------------------------------------------------
     // TOUCH
     // --------------------------------------------------------
 
-    Serial.println("[BOOT] Initialisation tactile...");
+    Serial.println(
+        "[BOOT] Initialisation tactile..."
+    );
 
     touchInit(tft);
 
-    Serial.println("[BOOT] Tactile initialise");
+    Serial.println(
+        "[BOOT] Tactile initialise"
+    );
 
     // --------------------------------------------------------
     // WIFI
     // --------------------------------------------------------
 
-    Serial.println("[BOOT] Initialisation Wi-Fi...");
+    Serial.println(
+        "[BOOT] Initialisation Wi-Fi..."
+    );
 
     wifiSetMode(WIFI_MODE_OFF);
 
-    Serial.println("[BOOT] Wi-Fi initialise");
-
     wifiScreenInit(tft);
+
+    Serial.println(
+        "[BOOT] Wi-Fi initialise"
+    );
 
     // --------------------------------------------------------
     // SPLASH
     // --------------------------------------------------------
 
-    Serial.println("[BOOT] Affichage splash...");
+    Serial.println(
+        "[BOOT] Affichage splash..."
+    );
 
     splashInit(tft);
 
@@ -190,35 +315,44 @@ void setup()
 
     splashWait();
 
-    Serial.println("[BOOT] Splash termine");
+    Serial.println(
+        "[BOOT] Splash termine"
+    );
 
     // --------------------------------------------------------
     // MAIN
     // --------------------------------------------------------
 
-    Serial.println("[BOOT] Passage ecran principal...");
-
     currentScreen = 0;
 
-    showScreen(currentScreen);
+    showScreen(
+        currentScreen
+    );
 
-    Serial.print("[BOOT] Ecran affiche : ");
-    Serial.print(screenName(currentScreen));
-    Serial.print(" (");
-    Serial.print(currentScreen);
-    Serial.println(")");
+    Serial.print(
+        "[BOOT] Ecran : "
+    );
 
-    // --------------------------------------------------------
-    // FIN BOOT
-    // --------------------------------------------------------
+    Serial.print(
+        screenName(currentScreen)
+    );
+
+    Serial.print(
+        " ("
+    );
+
+    Serial.print(
+        currentScreen
+    );
+
+    Serial.println(
+        ")"
+    );
 
     Serial.println();
-    Serial.println("[BOOT] MAIN  : OK");
-    Serial.println("[BOOT] TOUCH : OK");
-    Serial.println("[BOOT] WIFI  : OK");
-    Serial.println();
-
-    Serial.println("=== BOOT TERMINE ===");
+    Serial.println(
+        "=== BOOT TERMINE ==="
+    );
     Serial.println();
 }
 
@@ -228,95 +362,182 @@ void setup()
 
 void loop()
 {
-    int16_t x;
-    int16_t y;
-    uint16_t z;
+    int16_t x = 0;
+    int16_t y = 0;
+
+    uint16_t z = 0;
 
     // --------------------------------------------------------
     // TOUCH
     // --------------------------------------------------------
 
-    if (touchRead(tft, x, y, z))
+    if (
+        touchRead(
+            tft,
+            x,
+            y,
+            z
+        )
+    )
     {
-        uint8_t screenBefore = currentScreen;
-        uint8_t screenAfter = currentScreen;
+        uint8_t screenBefore =
+            currentScreen;
+
+        uint8_t screenAfter =
+            currentScreen;
 
         bool handled = false;
 
         // ----------------------------------------------------
-        // MAIN
+        // TRAITEMENT ECRAN
         // ----------------------------------------------------
 
-        if (currentScreen == 0)
+        switch (
+            currentScreen
+        )
         {
-            handled = mainScreenTouch(
-                x,
-                y,
-                screenAfter
-            );
+            case 0:
+
+                handled =
+                    mainScreenTouch(
+                        x,
+                        y,
+                        screenAfter
+                    );
+
+                break;
+
+            case 1:
+
+                handled =
+                    systemeScreenTouch(
+                        x,
+                        y,
+                        screenAfter
+                    );
+
+                break;
+
+            case 2:
+
+                handled =
+                    wifiScreenTouch(
+                        x,
+                        y,
+                        screenAfter
+                    );
+
+                break;
+
+            case 3:
+            case 4:
+            case 5:
+
+                handled =
+                    simpleScreenTouch(
+                        x,
+                        y,
+                        screenAfter
+                    );
+
+                break;
+
+            default:
+
+                handled = false;
+
+                break;
         }
 
         // ----------------------------------------------------
-        // SYSTEME
-        // ----------------------------------------------------
-
-        else if (currentScreen == 1)
-        {
-            handled = systemeScreenTouch(
-                x,
-                y,
-                screenAfter
-            );
-        }
-
-        // ----------------------------------------------------
-        // WI-FI
-        // ----------------------------------------------------
-
-        else if (currentScreen == 2)
-        {
-            handled = wifiScreenTouch(
-                x,
-                y,
-                screenAfter
-            );
-        }
-
-        // ----------------------------------------------------
-        // LOG UNIQUE
-        // ----------------------------------------------------
-
-        if (handled)
-        {
-            currentScreen = screenAfter;
-        }
-
-        logTouchEvent(
-            screenBefore,
-            currentScreen,
-            x,
-            y,
-            z
-        );
-
-        // ----------------------------------------------------
-        // CHANGEMENT D'ECRAN
+        // EVENEMENT
         // ----------------------------------------------------
 
         if (
             handled &&
-            currentScreen != screenBefore
+            screenAfter != screenBefore
         )
         {
-            showScreen(currentScreen);
+            Serial.println(
+                "========================================"
+            );
+
+            Serial.print(
+                "# ECRAN : ["
+            );
+
+            Serial.print(
+                screenName(screenBefore)
+            );
+
+            Serial.print(
+                "] - [EVENT] [TOUCH] sur ("
+            );
+
+            Serial.print(
+                screenName(screenAfter)
+            );
+
+            Serial.print(
+                ") X : "
+            );
+
+            Serial.print(x);
+
+            Serial.print(
+                " Y : "
+            );
+
+            Serial.print(y);
+
+            Serial.print(
+                " Z : "
+            );
+
+            Serial.println(z);
+
+            Serial.print(
+                "[EVENT] Navigation : "
+            );
+
+            Serial.print(
+                screenName(screenBefore)
+            );
+
+            Serial.print(
+                " -> "
+            );
+
+            Serial.println(
+                screenName(screenAfter)
+            );
+
+            Serial.println(
+                "========================================"
+            );
+
+            // ------------------------------------------------
+            // CHANGEMENT ECRAN
+            // ------------------------------------------------
+
+            currentScreen =
+                screenAfter;
+
+            showScreen(
+                currentScreen
+            );
         }
+
+        delay(120);
     }
 
     // --------------------------------------------------------
     // LOOP WI-FI
     // --------------------------------------------------------
 
-    if (currentScreen == 2)
+    if (
+        currentScreen == 2
+    )
     {
         wifiScreenLoop(tft);
     }
