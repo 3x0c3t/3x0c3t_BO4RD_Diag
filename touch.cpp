@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <XPT2046_Touchscreen.h>
-#include <TFT_eSPI.h>
 
 #include "touch.h"
 
@@ -10,7 +9,8 @@
 // ============================================================
 
 static XPT2046_Touchscreen touch(
-    BO4RD_TOUCH_CS
+    BO4RD_TOUCH_CS,
+    BO4RD_TOUCH_IRQ
 );
 
 // ============================================================
@@ -23,43 +23,60 @@ static bool touchInitialized = false;
 // INITIALISATION
 // ============================================================
 
-void touchInit(
-    TFT_eSPI &tft
-)
+void touchInit(TFT_eSPI &tft)
 {
-    // --------------------------------------------------------
-    // TFT deselectionne
-    // --------------------------------------------------------
+    (void)tft;
 
-    tft.setTouch(nullptr);
+    Serial.println("[TOUCH] Initialisation XPT2046");
 
     // --------------------------------------------------------
-    // GPIO
+    // TFT CS
+    // --------------------------------------------------------
+
+    pinMode(BO4RD_TFT_CS, OUTPUT);
+    digitalWrite(BO4RD_TFT_CS, HIGH);
+
+    // --------------------------------------------------------
+    // TOUCH CS
     // --------------------------------------------------------
 
     pinMode(BO4RD_TOUCH_CS, OUTPUT);
-
-    digitalWrite(
-        BO4RD_TOUCH_CS,
-        HIGH
-    );
+    digitalWrite(BO4RD_TOUCH_CS, HIGH);
 
     // --------------------------------------------------------
-    // SPI materiel ESP8266
-    // GPIO14 = SCK
-    // GPIO12 = MISO
-    // GPIO13 = MOSI
+    // TOUCH IRQ
+    // --------------------------------------------------------
+
+    pinMode(BO4RD_TOUCH_IRQ, INPUT_PULLUP);
+
+    // --------------------------------------------------------
+    // SPI ESP8266
     // --------------------------------------------------------
 
     SPI.begin();
+
+    Serial.println("[TOUCH] SPI.begin() OK");
 
     // --------------------------------------------------------
     // XPT2046
     // --------------------------------------------------------
 
-    touch.begin(SPI);
+    touch.begin();
+
+    touch.setRotation(2);
 
     touchInitialized = true;
+
+    Serial.println("[TOUCH] XPT2046 initialise");
+
+    Serial.print("[TOUCH] CS  = GPIO");
+    Serial.println(BO4RD_TOUCH_CS);
+
+    Serial.print("[TOUCH] IRQ = GPIO");
+    Serial.println(BO4RD_TOUCH_IRQ);
+
+    Serial.print("[TOUCH] IRQ actuel = ");
+    Serial.println(digitalRead(BO4RD_TOUCH_IRQ));
 }
 
 // ============================================================
@@ -73,11 +90,13 @@ bool touchAvailable()
         return false;
     }
 
+    digitalWrite(BO4RD_TFT_CS, HIGH);
+
     return touch.touched();
 }
 
 // ============================================================
-// LECTURE
+// LECTURE TOUCH
 // ============================================================
 
 bool touchRead(
@@ -94,16 +113,65 @@ bool touchRead(
         return false;
     }
 
+    // --------------------------------------------------------
+    // TFT OFF
+    // --------------------------------------------------------
+
+    digitalWrite(BO4RD_TFT_CS, HIGH);
+
+    // --------------------------------------------------------
+    // TEST TOUCH
+    // --------------------------------------------------------
+
     if (!touch.touched())
     {
         return false;
     }
 
-    TS_Point p = touch.getPoint();
+    // --------------------------------------------------------
+    // LECTURE XPT2046
+    // --------------------------------------------------------
 
-    x = p.x;
-    y = p.y;
-    pressure = p.z;
+    TS_Point point = touch.getPoint();
+
+    // --------------------------------------------------------
+    // VALEURS BRUTES
+    // --------------------------------------------------------
+
+    x = point.x;
+    y = point.y;
+    pressure = point.z;
+
+    // --------------------------------------------------------
+    // LOG BRUT
+    // --------------------------------------------------------
+
+    Serial.print("[TOUCH] RAW X=");
+    Serial.print(x);
+
+    Serial.print(" Y=");
+    Serial.print(y);
+
+    Serial.print(" Z=");
+    Serial.println(pressure);
+
+    // --------------------------------------------------------
+    // REJET DES VALEURS MANIFESTEMENT INVALIDES
+    // --------------------------------------------------------
+
+    if (
+        x == 0 &&
+        y == 0 &&
+        pressure >= 4095
+    )
+    {
+        Serial.println("[TOUCH] Valeur invalide ignoree");
+        return false;
+    }
+
+    // --------------------------------------------------------
+    // CONTACT VALIDE
+    // --------------------------------------------------------
 
     return true;
 }

@@ -5,22 +5,31 @@
 #include <TFT_eSPI.h>
 
 // ============================================================
-// 3x0c3t BO4RD
-// XPT2046 TOUCH
+// XPT2046
 // ============================================================
 
-#define BO4RD_TOUCH_CS   0
-#define BO4RD_TOUCH_SCK  14
-#define BO4RD_TOUCH_MOSI 13
-#define BO4RD_TOUCH_MISO 12
+#define BO4RD_TOUCH_CS    0
+#define BO4RD_TOUCH_IRQ   5
+
+// ============================================================
+// SPI
+// ============================================================
+
+#define BO4RD_TOUCH_SCK   14
+#define BO4RD_TOUCH_MOSI  13
+#define BO4RD_TOUCH_MISO  12
+
+// ============================================================
+// TFT
+// ============================================================
+
+#define BO4RD_TFT_CS      15
 
 // ============================================================
 // API
 // ============================================================
 
-void touchInit(
-    TFT_eSPI &tft
-);
+void touchInit(TFT_eSPI &tft);
 
 bool touchAvailable();
 

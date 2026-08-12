@@ -1,177 +1,98 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-// ============================================================
-// 3x0c3t BO4RD DIAGNOSTIC
-// GESTION CENTRALISEE DES LOGS
-// ============================================================
-//
-// NIVEAUX
-//
-// 0 = aucun log
-// 1 = logs importants
-// 2 = logs complets
-//
-// ============================================================
-
+#include <Arduino.h>
 
 // ============================================================
-// CONFIGURATION
+// DEBUG MAIN
 // ============================================================
 
-#define DEBUG_BOOT      0
-#define DEBUG_MAIN      1
-#define DEBUG_TOUCH     2
-#define DEBUG_WIFI      0
-#define DEBUG_DISPLAY   0
-#define DEBUG_SPLASH    0
-#define DEBUG_SYSTEME   0
+#define DEBUG_MAIN 1
+#define DEBUG_MAIN_DETAIL 0
 
+#if DEBUG_MAIN
 
-// ============================================================
-// BOOT
-// ============================================================
+#define LOG_MAIN(x)       Serial.print(x)
+#define LOGLN_MAIN(x)     Serial.println(x)
 
-#if DEBUG_BOOT >= 1
-    #define LOG_BOOT(x)       Serial.print(x)
-    #define LOGLN_BOOT(x)     Serial.println(x)
 #else
-    #define LOG_BOOT(x)
-    #define LOGLN_BOOT(x)
+
+#define LOG_MAIN(x)
+#define LOGLN_MAIN(x)
+
 #endif
 
-#if DEBUG_BOOT >= 2
-    #define LOG_BOOT_DETAIL(x)       Serial.print(x)
-    #define LOGLN_BOOT_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_BOOT_DETAIL(x)
-    #define LOGLN_BOOT_DETAIL(x)
-#endif
-
-
 // ============================================================
-// MAIN
+// DEBUG MAIN DETAIL
 // ============================================================
 
-#if DEBUG_MAIN >= 1
-    #define LOG_MAIN(x)       Serial.print(x)
-    #define LOGLN_MAIN(x)     Serial.println(x)
-#else
-    #define LOG_MAIN(x)
-    #define LOGLN_MAIN(x)
-#endif
+#if DEBUG_MAIN_DETAIL
 
-#if DEBUG_MAIN >= 2
-    #define LOG_MAIN_DETAIL(x)       Serial.print(x)
-    #define LOGLN_MAIN_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_MAIN_DETAIL(x)
-    #define LOGLN_MAIN_DETAIL(x)
-#endif
+#define LOG_MAIN_DETAIL(x)   Serial.print(x)
+#define LOGLN_MAIN_DETAIL(x) Serial.println(x)
 
+#else
+
+#define LOG_MAIN_DETAIL(x)
+#define LOGLN_MAIN_DETAIL(x)
+
+#endif
 
 // ============================================================
-// TOUCH
+// DEBUG SYSTEME
 // ============================================================
 
-#if DEBUG_TOUCH >= 1
-    #define LOG_TOUCH(x)       Serial.print(x)
-    #define LOGLN_TOUCH(x)     Serial.println(x)
-#else
-    #define LOG_TOUCH(x)
-    #define LOGLN_TOUCH(x)
-#endif
+#define DEBUG_SYSTEME 1
 
-#if DEBUG_TOUCH >= 2
-    #define LOG_TOUCH_DETAIL(x)       Serial.print(x)
-    #define LOGLN_TOUCH_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_TOUCH_DETAIL(x)
-    #define LOGLN_TOUCH_DETAIL(x)
-#endif
+#if DEBUG_SYSTEME
 
+#define LOG_SYSTEME(x)       Serial.print(x)
+#define LOGLN_SYSTEME(x)     Serial.println(x)
+
+#else
+
+#define LOG_SYSTEME(x)
+#define LOGLN_SYSTEME(x)
+
+#endif
 
 // ============================================================
-// WIFI
+// DEBUG ECRAN WIFI
+// ============================================================
+// Ne PAS utiliser DEBUG_WIFI.
+// Ce nom existe déjà dans ESP8266WiFi.h.
 // ============================================================
 
-#if DEBUG_WIFI >= 1
-    #define LOG_WIFI(x)       Serial.print(x)
-    #define LOGLN_WIFI(x)     Serial.println(x)
-#else
-    #define LOG_WIFI(x)
-    #define LOGLN_WIFI(x)
-#endif
+#define DEBUG_WIFI_SCREEN 1
 
-#if DEBUG_WIFI >= 2
-    #define LOG_WIFI_DETAIL(x)       Serial.print(x)
-    #define LOGLN_WIFI_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_WIFI_DETAIL(x)
-    #define LOGLN_WIFI_DETAIL(x)
-#endif
+#if DEBUG_WIFI_SCREEN
 
+#define LOG_WIFI(x)       Serial.print(x)
+#define LOGLN_WIFI(x)     Serial.println(x)
+
+#else
+
+#define LOG_WIFI(x)
+#define LOGLN_WIFI(x)
+
+#endif
 
 // ============================================================
-// DISPLAY
+// DEBUG TOUCH
 // ============================================================
 
-#if DEBUG_DISPLAY >= 1
-    #define LOG_DISPLAY(x)       Serial.print(x)
-    #define LOGLN_DISPLAY(x)     Serial.println(x)
+#define DEBUG_TOUCH 1
+
+#if DEBUG_TOUCH
+
+#define LOG_TOUCH(x)       Serial.print(x)
+#define LOGLN_TOUCH(x)     Serial.println(x)
+
 #else
-    #define LOG_DISPLAY(x)
-    #define LOGLN_DISPLAY(x)
-#endif
 
-#if DEBUG_DISPLAY >= 2
-    #define LOG_DISPLAY_DETAIL(x)       Serial.print(x)
-    #define LOGLN_DISPLAY_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_DISPLAY_DETAIL(x)
-    #define LOGLN_DISPLAY_DETAIL(x)
-#endif
+#define LOG_TOUCH(x)
+#define LOGLN_TOUCH(x)
 
-
-// ============================================================
-// SPLASH
-// ============================================================
-
-#if DEBUG_SPLASH >= 1
-    #define LOG_SPLASH(x)       Serial.print(x)
-    #define LOGLN_SPLASH(x)     Serial.println(x)
-#else
-    #define LOG_SPLASH(x)
-    #define LOGLN_SPLASH(x)
-#endif
-
-#if DEBUG_SPLASH >= 2
-    #define LOG_SPLASH_DETAIL(x)       Serial.print(x)
-    #define LOGLN_SPLASH_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_SPLASH_DETAIL(x)
-    #define LOGLN_SPLASH_DETAIL(x)
-#endif
-
-
-// ============================================================
-// SYSTEME
-// ============================================================
-
-#if DEBUG_SYSTEME >= 1
-    #define LOG_SYSTEME(x)       Serial.print(x)
-    #define LOGLN_SYSTEME(x)     Serial.println(x)
-#else
-    #define LOG_SYSTEME(x)
-    #define LOGLN_SYSTEME(x)
-#endif
-
-#if DEBUG_SYSTEME >= 2
-    #define LOG_SYSTEME_DETAIL(x)       Serial.print(x)
-    #define LOGLN_SYSTEME_DETAIL(x)     Serial.println(x)
-#else
-    #define LOG_SYSTEME_DETAIL(x)
-    #define LOGLN_SYSTEME_DETAIL(x)
 #endif
 
 #endif
